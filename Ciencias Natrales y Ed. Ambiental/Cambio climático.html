@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-Reto Colombia: Guardianes del Planeta</title>
+    <!-- Tailwind CSS para diseño moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Outfit (amigable y moderna para adolescentes) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome para iconos hermosos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Confetti para celebrar logros -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f0fdf4; /* Light green-50 */
+        }
+        /* Transiciones suaves de sección */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Animación para pulso de insignias */
+        .badge-pulse {
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0px rgba(16, 185, 129, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 15px 5px rgba(16, 185, 129, 0.2); }
+        }
+        /* Estilo para las tarjetas seleccionables */
+        .clickable-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .clickable-card:hover {
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-slate-800 selection:bg-emerald-200">
+
+    <!-- CABECERA PRINCIPAL (Visible durante el reto) -->
+    <header id="global-header" class="hidden bg-white/80 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-500 text-white p-2 rounded-xl shadow-md">
+                    <i class="fa-solid fa-leaf text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-emerald-800 leading-tight">Eco-Reto Colombia</h1>
+                    <p class="text-xs text-slate-500 font-medium">Grado 8° - Guardián de la Biodiversidad</p>
+                </div>
+            </div>
+
+            <!-- Dashboard de progreso en tiempo real -->
+            <div class="flex items-center gap-4 sm:gap-6 ml-auto">
+                <!-- Temporizador -->
+                <div id="timer-container" class="hidden flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1.5 rounded-full text-sm font-semibold">
+                    <i class="fa-solid fa-hourglass-half animate-spin text-amber-500" style="animation-duration: 3s;"></i>
+                    <span id="timer-display">05:00</span>
+                </div>
+
+                <!-- Eco-Puntos -->
+                <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-1.5 rounded-full flex items-center gap-2 font-bold shadow-sm transition-all duration-300" id="points-badge">
+                    <i class="fa-solid fa-seedling text-emerald-500 text-lg animate-bounce"></i>
+                    <span id="score-text">0</span> <span class="text-xs font-normal text-emerald-600">puntos</span>
+                </div>
+
+                <!-- Insignia Actual -->
+                <div class="hidden md:flex items-center gap-2 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full text-xs font-semibold text-sky-800" id="current-badge-display">
+                    <i class="fa-solid fa-award text-sky-500"></i>
+                    <span id="current-badge-name">Explorador Inicial</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de Progreso Dinámica -->
+        <div class="w-full bg-slate-100 h-2 relative overflow-hidden">
+            <div id="main-progress-bar" class="bg-gradient-to-r from-emerald-400 to-teal-500 h-full w-0 transition-all duration-500 ease-out"></div>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR DE CONTENIDO PRINCIPAL -->
+    <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-6 md:py-10 flex flex-col justify-center">
+
+        <!-- PANTALLA 1: INICIO / BIENVENIDA -->
+        <section id="screen-welcome" class="fade-in bg-white rounded-3xl shadow-xl border border-emerald-100 p-6 md:p-12 text-center max-w-3xl mx-auto">
+            <div class="inline-block bg-emerald-100 text-emerald-800 text-xs font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+                🌿 Aprendizaje Basado en Retos | Colombia 2026
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-slate-800 mb-4 leading-tight">
+                ¿Tienes lo necesario para ser un <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">Héroe del Planeta</span>?
+            </h1>
+            <p class="text-lg text-slate-600 mb-8 max-w-xl mx-auto">
+                Colombia es el segundo país más biodiverso del mundo, pero el cambio climático amenaza nuestros páramos, selvas y océanos. ¡Acepta el reto, supera las misiones y obtén tu certificación ambiental!
+            </p>
+
+            <!-- Video Ilustrativo o Animación -->
+            <div class="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 mb-8 max-w-xl mx-auto aspect-video bg-slate-900 flex flex-col items-center justify-center text-white">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 z-10"></div>
+                <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80" alt="Naturaleza Colombiana" class="absolute inset-0 w-full h-full object-cover opacity-80" onerror="this.src='https://placehold.co/800x450/10b981/ffffff?text=Biodiversidad+Colombiana'">
+                <div class="z-20 p-6 text-left absolute bottom-0 left-0 right-0">
+                    <span class="bg-amber-400 text-slate-900 text-xs font-bold px-2.5 py-1 rounded-md mb-2 inline-block">Sabías que...</span>
+                    <p class="text-sm md:text-base font-semibold leading-snug">El 50% de los páramos del mundo están en Colombia. Si la temperatura global sube 1.5°C, podríamos perderlos para siempre.</p>
+                </div>
+            </div>
+
+            <!-- Opciones de Configuración -->
+            <div class="max-w-md mx-auto mb-8 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-left">
+                <label class="block text-sm font-bold text-emerald-900 mb-2">Ingresa tu Nombre de Defensor:</label>
+                <input type="text" id="player-name" placeholder="Ej. Valentina" class="w-full px-4 py-3 rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 font-semibold mb-4">
+                
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="block text-sm font-bold text-emerald-900">Activar Temporizador</span>
+                        <span class="text-xs text-emerald-600">Agrega emoción al reto (5 minutos)</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="timer-toggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="startChallenge()" class="w-full max-w-xs bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-lg py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all">
+                ¡Iniciar Aventura! <i class="fa-solid fa-chevron-right ml-2"></i>
+            </button>
+        </section>
+
+        <!-- PANTALLA 2: INTRODUCCIÓN Y DATOS IMPRESCINDIBLES (Fase 1) -->
+        <section id="screen-intro" class="hidden fade-in bg-white rounded-3xl shadow-xl border border-emerald-100 p-6 md:p-10">
+            <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase">Fase 1: El Diagnóstico</span>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mt-1 mb-6">El Cambio Climático y Colombia</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Tarjeta de Dato Curioso 1 -->
+                <div class="p-6 bg-amber-50 rounded-2xl border border-amber-200 flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-fire"></i>
+                        </div>
+                        <h3 class="font-bold text-amber-900 text-lg mb-2">Efecto Invernadero</h3>
+                        <p class="text-sm text-slate-600">Gases como el CO2 y el metano atrapan el calor solar en la atmósfera. Es como dejar un auto cerrado bajo el sol.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Dato Curioso 2 -->
+                <div class="p-6 bg-sky-50 rounded-2xl border border-sky-200 flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-xl flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-droplet"></i>
+                        </div>
+                        <h3 class="font-bold text-sky-900 text-lg mb-2">Nuestros Frailejones</h3>
+                        <p class="text-sm text-slate-600">Estas plantas capturan el agua de la niebla en los páramos. Crecen solo 1 cm por año y están en peligro crítico.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Dato Curioso 3 -->
+                <div class="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-tree"></i>
+                        </div>
+                        <h3 class="font-bold text-emerald-900 text-lg mb-2">La Deforestación</h3>
+                        <p class="text-sm text-slate-600">En la Amazonía colombiana, miles de hectáreas se talan cada año para ganadería, quitándole el hogar a millones de especies.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video complementario -->
+            <div class="p-5 bg-slate-50 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-6">
+                <div class="w-full md:w-1/3 aspect-video bg-emerald-100 rounded-xl overflow-hidden shadow-inner flex items-center justify-center text-center p-4">
+                    <div>
+                        <i class="fa-solid fa-circle-play text-4xl text-emerald-600 mb-2 animate-pulse"></i>
+                        <p class="text-xs font-semibold text-emerald-800">Cápsula Informativa</p>
+                    </div>
+                </div>
+                <div class="w-full md:w-2/3">
+                    <h4 class="font-bold text-slate-800 mb-1">Misión de Aprendizaje</h4>
+                    <p class="text-sm text-slate-600 mb-3">La temperatura de la Tierra ha subido más de 1.1°C desde la era preindustrial. Esto altera el clima, causa lluvias extremas en la región andina y fuertes sequías en la Guajira.</p>
+                    <span class="inline-block bg-teal-100 text-teal-800 text-xs font-bold px-3 py-1 rounded-full">Reto 8° grado</span>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="goToTrivia()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">
+                    Entendido, ¡Ir a la Trivia! <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA 3: TRIVIA INTERACTIVA (Fase 2) -->
+        <section id="screen-trivia" class="hidden fade-in bg-white rounded-3xl shadow-xl border border-emerald-100 p-6 md:p-10">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase">Fase 2: El Conocimiento</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-800">Trivia Climática</h2>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-500 block font-semibold">Progreso Trivia</span>
+                    <span id="trivia-counter" class="text-emerald-700 font-extrabold text-lg">Pregunta 1 de 8</span>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Pregunta -->
+            <div class="bg-gradient-to-br from-emerald-50 to-teal-50/50 p-6 md:p-8 rounded-2xl border border-emerald-100 mb-6">
+                <p id="trivia-question" class="text-lg md:text-xl font-bold text-slate-800 leading-snug">Cargando pregunta...</p>
+            </div>
+
+            <!-- Opciones de Respuesta -->
+            <div id="trivia-options" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <!-- Se inyectan dinámicamente -->
+            </div>
+
+            <!-- Panel de Retroalimentación en tiempo real -->
+            <div id="trivia-feedback" class="hidden p-5 rounded-2xl mb-6 transition-all duration-300">
+                <div class="flex gap-4 items-start">
+                    <div id="feedback-icon-container" class="p-2 rounded-xl text-xl">
+                        <!-- Icono dinámico -->
+                    </div>
+                    <div>
+                        <h4 id="feedback-title" class="font-bold text-base">Retroalimentación</h4>
+                        <p id="feedback-text" class="text-sm mt-1 leading-relaxed">Explicación de la respuesta.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de navegación de trivia -->
+            <div class="flex justify-end">
+                <button id="trivia-next-btn" onclick="nextQuestion()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">
+                    Siguiente Pregunta <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA 4: CLASIFICADOR DE RESIDUOS (Fase 3) -->
+        <section id="screen-sorting" class="hidden fade-in bg-white rounded-3xl shadow-xl border border-emerald-100 p-6 md:p-10">
+            <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase">Fase 3: Laboratorio de Reciclaje</span>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mt-1 mb-2">Clasifica según la norma colombiana</h2>
+            <p class="text-sm text-slate-500 mb-6">Arrastra el residuo hacia la caneca correcta o haz clic en el elemento y luego en la caneca. ¡Resolución 2184 de 2019!</p>
+
+            <!-- Zona de juego -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <!-- Bote Blanco (Aprovechables) -->
+                <div id="bin-white" class="border-2 border-dashed border-slate-300 bg-white rounded-2xl p-6 flex flex-col items-center transition-all duration-200 hover:border-slate-400 py-8 text-center" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'white')">
+                    <div class="w-20 h-24 bg-white border-4 border-slate-300 rounded-b-2xl rounded-t-lg relative shadow-md flex items-end justify-center pb-2">
+                        <div class="absolute top-2 w-16 h-2 bg-slate-300 rounded-full"></div>
+                        <span class="text-xs font-bold text-slate-600">BLANCO</span>
+                    </div>
+                    <h3 class="font-bold text-slate-800 mt-4 text-sm">Residuos Aprovechables</h3>
+                    <p class="text-xs text-slate-400 mt-1">Plástico limpio, cartón, vidrio, papel, metales.</p>
+                </div>
+
+                <!-- Bote Negro (No Aprovechables) -->
+                <div id="bin-black" class="border-2 border-dashed border-slate-800 bg-slate-900 text-white rounded-2xl p-6 flex flex-col items-center transition-all duration-200 py-8 text-center" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'black')">
+                    <div class="w-20 h-24 bg-slate-800 border-4 border-slate-700 rounded-b-2xl rounded-t-lg relative shadow-md flex items-end justify-center pb-2">
+                        <div class="absolute top-2 w-16 h-2 bg-slate-700 rounded-full"></div>
+                        <span class="text-xs font-bold text-slate-300">NEGRO</span>
+                    </div>
+                    <h3 class="font-bold text-white mt-4 text-sm">No Aprovechables</h3>
+                    <p class="text-xs text-slate-400 mt-1">Papel higiénico, servilletas usadas, cartón con grasa, tapabocas.</p>
+                </div>
+
+                <!-- Bote Verde (Orgánicos) -->
+                <div id="bin-green" class="border-2 border-dashed border-emerald-600 bg-emerald-50 rounded-2xl p-6 flex flex-col items-center transition-all duration-200 hover:border-emerald-700 py-8 text-center" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'green')">
+                    <div class="w-20 h-24 bg-emerald-600 border-4 border-emerald-500 rounded-b-2xl rounded-t-lg relative shadow-md flex items-end justify-center pb-2">
+                        <div class="absolute top-2 w-16 h-2 bg-emerald-500 rounded-full"></div>
+                        <span class="text-xs font-bold text-white">VERDE</span>
+                    </div>
+                    <h3 class="font-bold text-emerald-900 mt-4 text-sm">Orgánicos Aprovechables</h3>
+                    <p class="text-xs text-emerald-600/70 mt-1">Restos de comida, desechos agrícolas, podas de jardín.</p>
+                </div>
+            </div>
+
+            <!-- Residuo Actual a Clasificar -->
+            <div class="mt-8 bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col items-center">
+                <p class="text-sm font-semibold text-slate-500 mb-4 uppercase">Residuo para clasificar:</p>
+                
+                <div id="sorting-item-container" class="flex flex-wrap justify-center gap-4">
+                    <!-- Tarjeta del residuo activo -->
+                    <div id="active-trash-item" draggable="true" ondragstart="handleDragStart(event)" class="bg-white px-6 py-4 rounded-xl shadow-md border border-slate-200 cursor-grab active:cursor-grabbing flex items-center gap-3 font-bold text-slate-700 hover:border-emerald-500 transition-all select-none">
+                        <!-- Generado dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Control alternativo para móviles (Tocar para asignar) -->
+                <div class="mt-6 flex flex-wrap justify-center gap-2 md:hidden">
+                    <button onclick="sortItemViaButton('white')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-4 py-2 rounded-lg">Mandar a Blanco</button>
+                    <button onclick="sortItemViaButton('black')" class="bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-lg">Mandar a Negro</button>
+                    <button onclick="sortItemViaButton('green')" class="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-lg">Mandar a Verde</button>
+                </div>
+            </div>
+
+            <!-- Feedback del clasificador -->
+            <div id="sorting-feedback" class="hidden mt-6 p-4 rounded-xl text-center font-bold text-sm"></div>
+
+            <div class="flex justify-between items-center mt-8">
+                <span class="text-xs text-slate-400">Residuos restantes: <span id="sorting-remaining" class="font-bold text-slate-600">6</span></span>
+                <button id="sorting-next-btn" onclick="goToMatching()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">
+                    Siguiente Reto <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA 5: CONECTAR CAUSA Y CONSECUENCIA (Fase 4) -->
+        <section id="screen-matching" class="hidden fade-in bg-white rounded-3xl shadow-xl border border-emerald-100 p-6 md:p-10">
+            <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase">Fase 4: Conexión Ambiental</span>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mt-1 mb-2">Relaciona las Causas y las Consecuencias</h2>
+            <p class="text-sm text-slate-500 mb-6">Haz clic en una Causa (izquierda) y luego en su correspondiente Consecuencia ecológica (derecha) para emparejarlas.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+                <!-- Columna Causas -->
+                <div class="space-y-4">
+                    <h3 class="font-extrabold text-sm uppercase text-slate-400 tracking-wider mb-2">Causas (Acción humana)</h3>
+                    <div id="cause-column" class="space-y-3">
+                        <!-- Causas dinámicas -->
+                    </div>
+                </div>
+
+                <!-- Columna Consecuencias -->
+                <div class="space-y-4">
+                    <h3 class="font-extrabold text-sm uppercase text-slate-400 tracking-wider mb-2">Consecuencias (Efecto ambiental)</h3>
+                    <div id="consequence-column" class="space-y-3">
+                        <!-- Consecuencias dinámicas -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback del apareamiento -->
+            <div id="matching-feedback" class="hidden mt-6 p-4 rounded-xl text-center font-bold text-sm"></div>
+
+            <div class="flex justify-end mt-8">
+                <button id="matching-next-btn" onclick="goToCaseStudy()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">
+                    Ir al Caso Comunitario <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA 6: RESOLUCIÓN DE CASO COMUNITARIO (Fase 5) -->
+        <section id="screen-case" class="hidden fade-in bg-white rounded-3xl shadow-xl border border-emerald-100 p-6 md:p-10">
+            <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase">Fase 5: Tomando Decisiones</span>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mt-1 mb-2">Caso de Estudio: "La Quebrada La Leonera"</h2>
+            <p class="text-sm text-slate-500 mb-6">Eres el líder ambiental escolar en una comunidad rural de Colombia. Analiza la situación y decide la mejor alternativa de sostenibilidad.</p>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 mb-8">
+                <div class="flex flex-col md:flex-row gap-6 items-start">
+                    <div class="bg-emerald-100 text-emerald-800 p-4 rounded-2xl flex items-center justify-center text-4xl w-16 h-16 shrink-0">
+                        <i class="fa-solid fa-water"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg mb-2">El Problema:</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-3">
+                            La quebrada que abastece de agua a la escuela y a 50 familias está siendo contaminada por vertimientos de basuras y aguas residuales. Se observa muerte de peces y los estudiantes reportan problemas estomacales. Varias personas sugieren construir un muro para ocultar la vista o simplemente comprar agua embotellada para la escuela.
+                        </p>
+                        <span class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-md">Reto: Hallar una solución sustentable y participativa.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opciones de solución -->
+            <div class="grid grid-cols-1 gap-4 mb-6" id="case-options-container">
+                <!-- Opción A -->
+                <div onclick="selectCaseOption('A')" id="case-opt-A" class="clickable-card bg-white border border-slate-200 hover:border-emerald-400 p-5 rounded-2xl cursor-pointer transition-all flex items-start gap-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-700 shrink-0" id="case-badge-A">A</div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-base mb-1">Muro y Agua Embotellada</h4>
+                        <p class="text-sm text-slate-500">Cercar la quebrada con una cerca de cemento para que nadie tire basura allí y proveer botellas plásticas diarias a todos los estudiantes de la escuela.</p>
+                    </div>
+                </div>
+
+                <!-- Opción B -->
+                <div onclick="selectCaseOption('B')" id="case-opt-B" class="clickable-card bg-white border border-slate-200 hover:border-emerald-400 p-5 rounded-2xl cursor-pointer transition-all flex items-start gap-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-700 shrink-0" id="case-badge-B">B</div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-base mb-1">Jornada Comunitaria, Reforestación y Alertas</h4>
+                        <p class="text-sm text-slate-500">Organizar jornadas de limpieza escolar, sembrar especies nativas en la ribera para filtrar contaminantes (fitorremediación), e instalar letreros pedagógicos vigilados por un comité juvenil.</p>
+                    </div>
+                </div>
+
+                <!-- Opción C -->
+                <div onclick="selectCaseOption('C')" id="case-opt-C" class="clickable-card bg-white border border-slate-200 hover:border-emerald-400 p-5 rounded-2xl cursor-pointer transition-all flex items-start gap-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-700 shrink-0" id="case-badge-C">C</div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-base mb-1">Solución Tecnológica de Alto Costo</h4>
+                        <p class="text-sm text-slate-500">Esperar a que la Alcaldía local apruebe el presupuesto para construir una Planta de Tratamiento de Aguas Residuales de última tecnología, cancelando las clases hasta nuevo aviso.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Explicación del caso -->
+            <div id="case-feedback" class="hidden p-5 rounded-2xl mb-6">
+                <!-- Se llena mediante JS -->
+            </div>
+
+            <div class="flex justify-end">
+                <button id="case-next-btn" onclick="goToDebate()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">
+                    Pasar al Debate Virtual <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA 7: DEBATE VIRTUAL DE REFLEXIÓN (Fase 6) -->
+        <section id="screen-debate" class="hidden fade-in bg-white rounded-3xl shadow-xl border border-emerald-100 p-6 md:p-10">
+            <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase">Fase 6: Foro de Ciudadanía</span>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mt-1 mb-2">Mini Debate: Plásticos en el Colegio</h2>
+            <p class="text-sm text-slate-500 mb-6">¿Debería nuestra institución prohibir totalmente la venta de empaques plásticos de un solo uso, aun si esto aumenta un poco el costo de los alimentos en la tienda escolar?</p>
+
+            <!-- Selector de Postura -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div onclick="selectDebateStance('favor')" id="stance-favor" class="clickable-card border border-slate-200 p-4 rounded-xl cursor-pointer text-center hover:border-emerald-500">
+                    <i class="fa-regular fa-thumbs-up text-emerald-500 text-2xl mb-2"></i>
+                    <h4 class="font-bold text-slate-800">Totalmente a Favor</h4>
+                    <p class="text-xs text-slate-500 mt-1">La salud del planeta es prioridad absoluta sobre la comodidad.</p>
+                </div>
+                <div onclick="selectDebateStance('moderada')" id="stance-moderada" class="clickable-card border border-slate-200 p-4 rounded-xl cursor-pointer text-center hover:border-emerald-500">
+                    <i class="fa-solid fa-scale-balanced text-amber-500 text-2xl mb-2"></i>
+                    <h4 class="font-bold text-slate-800">Transición Gradual</h4>
+                    <p class="text-xs text-slate-500 mt-1">Reemplazar de a poco los plásticos buscando alternativas asequibles.</p>
+                </div>
+                <div onclick="selectDebateStance('contra')" id="stance-contra" class="clickable-card border border-slate-200 p-4 rounded-xl cursor-pointer text-center hover:border-emerald-500">
+                    <i class="fa-regular fa-thumbs-down text-rose-500 text-2xl mb-2"></i>
+                    <h4 class="font-bold text-slate-800">En Contra / Crítico</h4>
+                    <p class="text-xs text-slate-500 mt-1">Afectaría el bolsillo de estudiantes con menores recursos económicos.</p>
+                </div>
+            </div>
+
+            <!-- Justificación escrita -->
+            <div id="debate-input-container" class="hidden mb-6">
+                <label class="block text-sm font-bold text-slate-700 mb-2">Escribe tu argumento principal (mínimo 15 caracteres):</label>
+                <textarea id="debate-argument" rows="3" placeholder="Pienso que es importante porque..." class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm text-slate-700"></textarea>
+                <button onclick="submitDebateArgument()" class="mt-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-6 rounded-lg text-sm transition-all shadow-sm">
+                    Publicar en el Foro Escolar
+                </button>
+            </div>
+
+            <!-- Simulación de respuestas de otros estudiantes de Colombia -->
+            <div id="debate-chatbox" class="hidden bg-slate-50 border border-slate-200 rounded-2xl p-6 mt-6">
+                <h4 class="font-bold text-slate-800 text-sm mb-4 uppercase tracking-wider">Aportes del Foro (8° Grado):</h4>
+                <div class="space-y-4 max-h-60 overflow-y-auto pr-2" id="debate-chat-lines">
+                    <!-- Se llena con respuestas automáticas más el argumento del usuario -->
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-6">
+                <button id="debate-next-btn" onclick="goToCommitment()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">
+                    Siguiente: Tu Compromiso <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA 8: COMPROMISO INDIVIDUAL Y CERTIFICACIÓN (Fase 7) -->
+        <section id="screen-commitment" class="hidden fade-in bg-white rounded-3xl shadow-xl border border-emerald-100 p-6 md:p-10 text-center">
+            <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase">Fase Final: El Legado</span>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mt-1 mb-2">Sella Tu Compromiso Ecológico</h2>
+            <p class="text-sm text-slate-500 mb-8 max-w-xl mx-auto">Cada gran cambio empieza con un pequeño hábito. Selecciona un compromiso real que estés dispuesto a cumplir en tu hogar y colegio.</p>
+
+            <!-- Selección de compromisos precargados o personalizado -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto mb-8 text-left">
+                <div onclick="selectCommitmentOption(1)" id="commit-1" class="border border-slate-200 hover:border-emerald-500 p-4 rounded-xl cursor-pointer transition-all flex items-center gap-3">
+                    <i class="fa-solid fa-shower text-teal-500 text-xl"></i>
+                    <span class="text-sm font-semibold text-slate-700">Ducharme en menos de 5 minutos para cuidar el agua del páramo.</span>
+                </div>
+                <div onclick="selectCommitmentOption(2)" id="commit-2" class="border border-slate-200 hover:border-emerald-500 p-4 rounded-xl cursor-pointer transition-all flex items-center gap-3">
+                    <i class="fa-solid fa-plug text-amber-500 text-xl"></i>
+                    <span class="text-sm font-semibold text-slate-700">Desconectar cargadores y apagar luces que no esté usando.</span>
+                </div>
+                <div onclick="selectCommitmentOption(3)" id="commit-3" class="border border-slate-200 hover:border-emerald-500 p-4 rounded-xl cursor-pointer transition-all flex items-center gap-3">
+                    <i class="fa-solid fa-bag-shopping text-emerald-500 text-xl"></i>
+                    <span class="text-sm font-semibold text-slate-700">Llevar bolsas de tela a los supermercados y tiendas del barrio.</span>
+                </div>
+                <div onclick="selectCommitmentOption(4)" id="commit-4" class="border border-slate-200 hover:border-emerald-500 p-4 rounded-xl cursor-pointer transition-all flex items-center gap-3">
+                    <i class="fa-solid fa-trash-arrow-up text-sky-500 text-xl"></i>
+                    <span class="text-sm font-semibold text-slate-700">Separar correctamente los residuos en las canecas de mi salón.</span>
+                </div>
+            </div>
+
+            <!-- Botón Generar Certificado -->
+            <button onclick="finishEcoChallenge()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-lg py-4 px-10 rounded-2xl shadow-md transition-all inline-block">
+                Firmar Compromiso y Ver Resultados <i class="fa-solid fa-file-contract ml-2"></i>
+            </button>
+        </section>
+
+        <!-- PANTALLA 9: CERTIFICADO Y RESUMEN FINAL -->
+        <section id="screen-results" class="hidden fade-in bg-white rounded-3xl shadow-xl border border-emerald-100 p-6 md:p-12 text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-emerald-800 mb-2">¡Felicitaciones, Guardián Ecológico!</h2>
+            <p class="text-slate-500 text-sm mb-8">Has finalizado el Eco-Reto con éxito y tomado acción por tu planeta.</p>
+
+            <!-- Cuadro de Nivel Alcanzado -->
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-8 max-w-lg mx-auto">
+                <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest block mb-2">Nivel de Conciencia Ambiental</span>
+                <div class="inline-block p-4 bg-emerald-100 rounded-full mb-3 text-emerald-600 text-4xl badge-pulse">
+                    <i id="level-icon" class="fa-solid fa-shield-heart"></i>
+                </div>
+                <h3 id="level-title" class="text-2xl font-black text-emerald-900 mb-1">Cargando Nivel...</h3>
+                <p id="level-desc" class="text-sm text-emerald-700 leading-relaxed">Breve descripción de las habilidades del nivel alcanzado.</p>
+            </div>
+
+            <!-- Datos Finales -->
+            <div class="grid grid-cols-3 gap-4 max-w-md mx-auto mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div class="text-center">
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Puntaje</span>
+                    <span id="final-points" class="text-2xl font-extrabold text-emerald-600">0</span>
+                </div>
+                <div class="text-center border-x border-slate-200">
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Insignias</span>
+                    <span id="final-badges" class="text-2xl font-extrabold text-sky-600">0/4</span>
+                </div>
+                <div class="text-center">
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Tiempo</span>
+                    <span id="final-time" class="text-2xl font-extrabold text-amber-600">--:--</span>
+                </div>
+            </div>
+
+            <!-- Diploma Virtual Impresionable/Compartible -->
+            <div id="diploma-frame" class="border-8 border-double border-emerald-600 p-6 md:p-10 bg-white max-w-xl mx-auto rounded-xl shadow-md mb-8 relative">
+                <div class="absolute top-4 right-4 text-emerald-600/10 text-8xl pointer-events-none select-none">
+                    <i class="fa-solid fa-tree-deciduous"></i>
+                </div>
+                <span class="text-xs font-bold text-emerald-700 tracking-widest uppercase block mb-2">RECONOCIMIENTO AMBIENTAL</span>
+                <h4 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-6">MINISTERIO JUVENIL DE ACCIÓN CLIMÁTICA</h4>
+                <p class="text-sm text-slate-500 italic mb-2">Se otorga con honor el título de:</p>
+                <h3 id="diploma-name" class="text-2xl md:text-3xl font-black text-slate-800 mb-2 underline decoration-emerald-500">Valentina</h3>
+                <p class="text-sm text-slate-600 max-w-sm mx-auto mb-4 font-semibold">Como un <span id="diploma-rank" class="text-emerald-600 font-bold">Héroe del Planeta</span> oficial, comprometido con salvaguardar la biodiversidad de Colombia.</p>
+                
+                <div class="border-t border-slate-200 pt-4 mt-6 max-w-xs mx-auto">
+                    <p class="text-xs text-slate-500 font-bold mb-1">Mi compromiso ecológico firmado:</p>
+                    <p id="diploma-commitment" class="text-xs text-emerald-700 italic font-semibold">"Apagar luces y desconectar cargadores"</p>
+                </div>
+            </div>
+
+            <!-- Botonera de acciones finales -->
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-md flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> Guardar/Imprimir Diploma
+                </button>
+                <button onclick="resetChallenge()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-md flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Reintentar Actividad
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-xs border-t border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p>© 2026 Eco-Reto Colombia. Diseñado con fines pedagógicos y constructores de resiliencia escolar.</p>
+            <div class="flex gap-4">
+                <span class="hover:text-emerald-400 transition-colors"><i class="fa-solid fa-circle-question"></i> Guía Instructiva</span>
+                <span class="hover:text-emerald-400 transition-colors"><i class="fa-solid fa-shield-halved"></i> Privacidad</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- BASE DE DATOS DE TRIVIA ---
+        const triviaData = [
+            {
+                question: "¿Cuál de estos gases de efecto invernadero es el principal causante del calentamiento global y proviene de quemar gasolina, carbón o diésel?",
+                options: ["Oxígeno", "Dióxido de Carbono (CO2)", "Helio", "Nitrógeno"],
+                correct: 1,
+                feedback: "¡Exacto! El CO2 atrapa el calor solar en la atmósfera. Proviene mayormente del transporte de combustible fósil y la industria."
+            },
+            {
+                question: "En la selva de la Amazonía colombiana, ¿cuál es la principal causa humana de pérdida de biodiversidad y deforestación masiva?",
+                options: ["Siembra de árboles frutales", "Construcción de escuelas ecológicas", "Tala ilegal y ganadería extensiva", "Turismo sostenible guiado"],
+                correct: 2,
+                feedback: "¡Tristemente correcto! Grandes sectores de selva se talan sin control para ganadería masiva, destruyendo el hábitat del jaguar y del oso de anteojos."
+            },
+            {
+                question: "¿Qué efecto directo tiene el cambio climático sobre los páramos de Colombia?",
+                options: ["Aumenta la cantidad de nieve", "Derrite los glaciares y reduce la cantidad de agua disponible", "Hace que crezcan más rápido los frailejones", "No tiene ningún impacto"],
+                correct: 1,
+                feedback: "¡Así es! Al subir la temperatura global, los páramos pierden su humedad y capacidad de captar agua para nuestras ciudades."
+            },
+            {
+                question: "¿Cuál de los siguientes ejemplos describe una energía limpia y renovable que reduce la contaminación de la atmósfera?",
+                options: ["Planta eléctrica de gasolina", "Quema de carbón mineral", "Energía solar y eólica", "Uso masivo de leña verde"],
+                correct: 2,
+                feedback: "¡Bien pensado! El sol y el viento nos brindan fuentes infinitas de energía sin emanar CO2 nocivo para la atmósfera terrestre."
+            },
+            {
+                question: "Cuando el océano absorbe demasiado CO2, ¿qué grave fenómeno afecta gravemente a los arrecifes de coral en el Caribe colombiano?",
+                options: ["Inundación marina de agua dulce", "Acidificación de los océanos", "Congelamiento costero", "Evaporación completa de las playas"],
+                correct: 1,
+                feedback: "¡Exacto! La acidificación debilita el esqueleto de caliza de los corales, provocando su muerte y dañando la cadena alimenticia de peces."
+            },
+            {
+                question: "En las famosas '3R' del cuidado ambiental, ¿cuál es el orden lógico para optimizar nuestros recursos?",
+                options: ["Regalar, Reír, Remitir", "Reducir, Reutilizar, Reciclar", "Restar, Resistir, Reclamar", "Recoger, Romper, Repartir"],
+                correct: 1,
+                feedback: "¡Correcto! Primero tratamos de comprar menos empaques (Reducir), luego darle un nuevo uso al envase (Reutilizar) y de último transformar el material (Reciclar)."
+            },
+            {
+                question: "¿Aproximadamente cuánto tiempo demora una bolsa de plástico común en descomponerse por completo en la naturaleza?",
+                options: ["Solo 5 semanas", "Entre 10 y 20 años", "Hasta 500 años", "Nunca se descompone, es eterna"],
+                correct: 2,
+                feedback: "¡Efectivamente! El plástico no desaparece rápido; se fragmenta en microplásticos nocivos que terminan siendo consumidos por la fauna marina y terrestre."
+            },
+            {
+                question: "¿Cuál es una consecuencia inmediata de la pérdida acelerada de nieve en la Sierra Nevada de Santa Marta?",
+                options: ["Más agua líquida todo el año para los pueblos", "Disminución de los ríos locales y alteración de las tradiciones indígenas", "Aparición de playas templadas de montaña", "Aumento repentino de osos polares"],
+                correct: 1,
+                feedback: "¡Excelente! Los glaciares proveen agua regulada a los ríos locales. Al derretirse velozmente, se generan sequías drásticas."
+            }
+        ];
+
+        // --- BASE DE DATOS DE CLASIFICACIÓN DE RESIDUOS (Resolución 2184) ---
+        const sortingItems = [
+            { name: "Botella plástica de gaseosa (limpia)", target: "white" },
+            { name: "Cáscara de banano y restos de papa", target: "green" },
+            { name: "Papel higiénico usado", target: "black" },
+            { name: "Lata de atún de aluminio enjuagada", target: "white" },
+            { name: "Servilleta muy engrasada con pizza", target: "black" },
+            { name: "Restos de poda del jardín escolar", target: "green" }
+        ];
+
+        // --- BASE DE DATOS DE RELACIONAR (CAUSA Y CONSECUENCIA) ---
+        const causeEffectPairs = [
+            { id: 1, text: "Uso excesivo de autos particulares de gasolina", type: "cause" },
+            { id: 1, text: "Aumento del CO2 atmosférico y calentamiento global", type: "consequence" },
+            { id: 2, text: "Tala incontrolada de selvas en el Amazonas", type: "cause" },
+            { id: 2, text: "Pérdida de hábitat silvestre, erosión e inundaciones", type: "consequence" },
+            { id: 3, text: "Arrojar plásticos de un solo uso en calles y quebradas", type: "cause" },
+            { id: 3, text: "Islas flotantes de basura que dañan peces y tortugas", type: "consequence" },
+            { id: 4, text: "Desechos químicos de fábricas arrojados a ríos", type: "cause" },
+            { id: 4, text: "Envenenamiento de fuentes hídricas y muerte de flora acuática", type: "consequence" }
+        ];
+
+        // --- VARIABLES DE ESTADO DEL JUEGO ---
+        let playerName = "";
+        let currentStep = 0; // Controla la pantalla activa
+        let ecoPoints = 0;
+        let badgesUnlocked = [];
+        
+        let timerActive = false;
+        let timerSeconds = 300; // 5 minutos
+        let timerInterval = null;
+
+        // Variables específicas de trivia
+        let currentQuestionIdx = 0;
+        let triviaScore = 0;
+
+        // Variables específicas de clasificación
+        let currentSortingIdx = 0;
+        let dragActiveItem = null;
+
+        // Variables específicas de apareamiento
+        let selectedCauseId = null;
+        let selectedConsequenceId = null;
+        let matchedPairsCount = 0;
+
+        // Variables específicas de debate
+        let debateStanceSelected = "";
+
+        // Variable de compromiso
+        let selectedCommitment = "";
+
+        // --- FUNCIÓN DE INICIO ---
+        function startChallenge() {
+            const inputName = document.getElementById('player-name').value.trim();
+            if(!inputName) {
+                alert("Por favor, introduce tu nombre de Defensor Ambiental para iniciar.");
+                return;
+            }
+            playerName = inputName;
+            timerActive = document.getElementById('timer-toggle').checked;
+
+            // Ocultar pantalla de bienvenida
+            document.getElementById('screen-welcome').classList.add('hidden');
+            
+            // Mostrar Cabecera Global con datos de jugador
+            document.getElementById('global-header').classList.remove('hidden');
+            updatePoints(0);
+
+            // Iniciar temporizador si se activó
+            if(timerActive) {
+                document.getElementById('timer-container').classList.remove('hidden');
+                startGlobalTimer();
+            }
+
+            // Ir a la primera fase real (Intro)
+            goToScreen('screen-intro');
+            updateProgressBar(14); // 14% de avance inicial
+        }
+
+        // --- TEMPORIZADOR GLOBAL ---
+        function startGlobalTimer() {
+            timerInterval = setInterval(() => {
+                if(timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerOut();
+                } else {
+                    timerSeconds--;
+                    const mins = Math.floor(timerSeconds / 60);
+                    const secs = timerSeconds % 60;
+                    document.getElementById('timer-display').innerText = 
+                        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        function timerOut() {
+            alert("⏰ ¡Se agotó el tiempo ecológico de acción! Pero no te preocupes, puedes seguir completando las misiones.");
+            document.getElementById('timer-container').className = "flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-3 py-1.5 rounded-full text-sm font-semibold";
+            document.getElementById('timer-display').innerText = "Fin de Tiempo";
+        }
+
+        // --- NAVEGADOR DE PANTALLAS ---
+        function goToScreen(screenId) {
+            // Ocultar todas
+            const screens = ['screen-welcome', 'screen-intro', 'screen-trivia', 'screen-sorting', 'screen-matching', 'screen-case', 'screen-debate', 'screen-commitment', 'screen-results'];
+            screens.forEach(s => {
+                const el = document.getElementById(s);
+                if(el) el.classList.add('hidden');
+            });
+
+            // Mostrar activa
+            const activeScreen = document.getElementById(screenId);
+            if(activeScreen) {
+                activeScreen.classList.remove('hidden');
+                activeScreen.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // --- ACTUALIZADOR DE INTERFAZ DE PROGRESO ---
+        function updateProgressBar(percentage) {
+            document.getElementById('main-progress-bar').style.width = `${percentage}%`;
+        }
+
+        function updatePoints(amount) {
+            ecoPoints += amount;
+            document.getElementById('score-text').innerText = ecoPoints;
+            
+            // Efecto flash en el indicador de puntos
+            const badge = document.getElementById('points-badge');
+            badge.classList.add('scale-110', 'bg-emerald-200');
+            setTimeout(() => {
+                badge.classList.remove('scale-110', 'bg-emerald-200');
+            }, 250);
+        }
+
+        function unlockBadge(badgeName) {
+            if(!badgesUnlocked.includes(badgeName)) {
+                badgesUnlocked.push(badgeName);
+                
+                // Mostrar alerta visual suave de insignia desbloqueada
+                const alertDiv = document.createElement('div');
+                alertDiv.className = "fixed bottom-5 right-5 bg-sky-900 text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-sky-400 z-50 fade-in";
+                alertDiv.innerHTML = `
+                    <div class="text-3xl text-amber-400"><i class="fa-solid fa-medal animate-bounce"></i></div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-sky-200">¡Nueva Insignia!</p>
+                        <p class="font-extrabold text-sm">${badgeName}</p>
+                    </div>
+                `;
+                document.body.appendChild(alertDiv);
+                
+                // Activar sonidos o confeti rápido
+                confetti({
+                    particleCount: 50,
+                    spread: 40,
+                    origin: { y: 0.9, x: 0.9 }
+                });
+
+                setTimeout(() => {
+                    alertDiv.classList.add('opacity-0');
+                    setTimeout(() => alertDiv.remove(), 500);
+                }, 4000);
+
+                // Actualizar cabecera
+                document.getElementById('current-badge-display').classList.remove('hidden');
+                document.getElementById('current-badge-name').innerText = badgeName;
+            }
+        }
+
+        // --- CONTROL DE TRIVIA (FASE 2) ---
+        function goToTrivia() {
+            goToScreen('screen-trivia');
+            updateProgressBar(28);
+            loadTriviaQuestion();
+        }
+
+        function loadTriviaQuestion() {
+            // Ocultar feedback y botón siguiente
+            document.getElementById('trivia-feedback').classList.add('hidden');
+            document.getElementById('trivia-next-btn').classList.add('hidden');
+
+            const current = triviaData[currentQuestionIdx];
+            document.getElementById('trivia-counter').innerText = `Pregunta ${currentQuestionIdx + 1} de ${triviaData.length}`;
+            document.getElementById('trivia-question').innerText = current.question;
+
+            // Renderizar opciones
+            const optContainer = document.getElementById('trivia-options');
+            optContainer.innerHTML = '';
+
+            current.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "clickable-card w-full text-left bg-white border-2 border-slate-200 hover:border-emerald-300 p-4 rounded-xl font-semibold text-slate-700 transition-all text-sm md:text-base flex justify-between items-center";
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <span class="w-6 h-6 rounded-full border border-slate-300 flex items-center justify-center text-xs text-slate-400">
+                        ${String.fromCharCode(65 + idx)}
+                    </span>
+                `;
+                btn.onclick = () => selectTriviaOption(idx, btn);
+                optContainer.appendChild(btn);
+            });
+        }
+
+        function selectTriviaOption(selectedIdx, buttonElement) {
+            // Desactivar clicks en todos los botones para que no cambien la respuesta
+            const buttons = document.getElementById('trivia-options').getElementsByTagName('button');
+            for(let btn of buttons) {
+                btn.disabled = true;
+                btn.classList.remove('hover:border-emerald-300');
+            }
+
+            const current = triviaData[currentQuestionIdx];
+            const feedbackContainer = document.getElementById('trivia-feedback');
+            const feedbackIcon = document.getElementById('feedback-icon-container');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackText = document.getElementById('feedback-text');
+
+            if(selectedIdx === current.correct) {
+                // Correcto
+                buttonElement.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-800');
+                buttonElement.querySelector('span:last-child').className = "w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-xs text-white";
+                buttonElement.querySelector('span:last-child').innerHTML = `<i class="fa-solid fa-check"></i>`;
+                
+                // Configurar feedback exitoso
+                feedbackContainer.className = "p-5 rounded-2xl mb-6 bg-emerald-50 border border-emerald-200 fade-in text-emerald-800";
+                feedbackIcon.className = "p-2 rounded-xl text-xl bg-emerald-100 text-emerald-600";
+                feedbackIcon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+                feedbackTitle.innerText = "¡Excelente Respuesta!";
+                feedbackText.innerText = current.feedback;
+
+                updatePoints(50);
+                triviaScore++;
+            } else {
+                // Incorrecto
+                buttonElement.classList.add('border-rose-500', 'bg-rose-50', 'text-rose-800');
+                buttonElement.querySelector('span:last-child').className = "w-6 h-6 rounded-full bg-rose-500 flex items-center justify-center text-xs text-white";
+                buttonElement.querySelector('span:last-child').innerHTML = `<i class="fa-solid fa-xmark"></i>`;
+
+                // Resaltar la correcta discretamente
+                const correctButton = buttons[current.correct];
+                correctButton.classList.add('border-emerald-300', 'bg-emerald-50/50');
+
+                // Configurar feedback error
+                feedbackContainer.className = "p-5 rounded-2xl mb-6 bg-rose-50 border border-rose-200 fade-in text-rose-800";
+                feedbackIcon.className = "p-2 rounded-xl text-xl bg-rose-100 text-rose-600";
+                feedbackIcon.innerHTML = `<i class="fa-solid fa-circle-xmark"></i>`;
+                feedbackTitle.innerText = "Sigue aprendiendo";
+                feedbackText.innerText = current.feedback;
+
+                updatePoints(10); // Puntos de consolación por participación
+            }
+
+            feedbackContainer.classList.remove('hidden');
+            document.getElementById('trivia-next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIdx++;
+            if(currentQuestionIdx < triviaData.length) {
+                loadTriviaQuestion();
+            } else {
+                // Fin de Trivia
+                unlockBadge("Pionero del Clima");
+                goToSorting();
+            }
+        }
+
+        // --- CONTROL DE CLASIFICACIÓN (FASE 3) ---
+        function goToSorting() {
+            goToScreen('screen-sorting');
+            updateProgressBar(42);
+            loadSortingItem();
+        }
+
+        function loadSortingItem() {
+            document.getElementById('sorting-feedback').classList.add('hidden');
+            const remaining = sortingItems.length - currentSortingIdx;
+            document.getElementById('sorting-remaining').innerText = remaining;
+
+            if(currentSortingIdx < sortingItems.length) {
+                const currentItem = sortingItems[currentSortingIdx];
+                const activeTrash = document.getElementById('active-trash-item');
+                
+                // Icono dinámico según residuo
+                let icon = '<i class="fa-solid fa-box text-emerald-500"></i>';
+                if(currentItem.name.includes("plástica") || currentItem.name.includes("Lata")) icon = '<i class="fa-solid fa-recycle text-blue-500"></i>';
+                else if(currentItem.name.includes("banano") || currentItem.name.includes("poda")) icon = '<i class="fa-solid fa-apple-whole text-green-600"></i>';
+                else if(currentItem.name.includes("higiénico") || currentItem.name.includes("Servilleta")) icon = '<i class="fa-solid fa-toilet-paper text-slate-400"></i>';
+
+                activeTrash.innerHTML = `${icon} <span>${currentItem.name}</span>`;
+            } else {
+                // Terminó todos los residuos
+                document.getElementById('active-trash-item').parentElement.innerHTML = `
+                    <div class="text-center p-4">
+                        <p class="text-emerald-700 font-extrabold text-lg mb-2"><i class="fa-solid fa-circle-check"></i> ¡Centro de Reciclaje Ordenado!</p>
+                        <p class="text-xs text-slate-500">Has clasificado correctamente según el código de colores oficial de Colombia (Blanco, Negro y Verde).</p>
+                    </div>
+                `;
+                unlockBadge("Especialista en Residuos");
+                document.getElementById('sorting-next-btn').classList.remove('hidden');
+            }
+        }
+
+        // Soporte para Drag and Drop tradicional de computadora
+        function handleDragStart(ev) {
+            ev.dataTransfer.setData("text/plain", sortingItems[currentSortingIdx].target);
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function handleDrop(ev, binColor) {
+            ev.preventDefault();
+            evaluateSorting(binColor);
+        }
+
+        // Soporte alternativo mediante botones para móviles
+        function sortItemViaButton(binColor) {
+            evaluateSorting(binColor);
+        }
+
+        function evaluateSorting(selectedBinColor) {
+            if(currentSortingIdx >= sortingItems.length) return;
+
+            const targetBinColor = sortingItems[currentSortingIdx].target;
+            const feedbackEl = document.getElementById('sorting-feedback');
+            feedbackEl.classList.remove('hidden');
+
+            if(selectedBinColor === targetBinColor) {
+                // Acierto
+                feedbackEl.className = "mt-6 p-4 rounded-xl text-center font-bold text-sm bg-emerald-100 text-emerald-800 fade-in";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-square-check"></i> ¡Correcto! Se depositó en la caneca correspondiente.`;
+                updatePoints(60);
+                
+                // Efecto de explosión de confeti suave sobre la caneca seleccionada
+                confetti({
+                    particleCount: 15,
+                    spread: 20,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                // Error
+                feedbackEl.className = "mt-6 p-4 rounded-xl text-center font-bold text-sm bg-rose-100 text-rose-800 fade-in";
+                let correctLabel = targetBinColor === 'white' ? 'BLANCA (Aprovechables)' : (targetBinColor === 'black' ? 'NEGRA (No aprovechables)' : 'VERDE (Orgánicos)');
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Incorrecto. Este residuo debió ir en la caneca ${correctLabel}.`;
+                updatePoints(10);
+            }
+
+            // Pausa rápida para ver retroalimentación y pasar al siguiente elemento
+            currentSortingIdx++;
+            setTimeout(() => {
+                loadSortingItem();
+            }, 2000);
+        }
+
+        // --- CONTROL DE RELACIONAR CONCEPTOS (FASE 4) ---
+        function goToMatching() {
+            goToScreen('screen-matching');
+            updateProgressBar(56);
+            loadMatchingGrid();
+        }
+
+        function loadMatchingGrid() {
+            const causeCol = document.getElementById('cause-column');
+            const consequenceCol = document.getElementById('consequence-column');
+
+            causeCol.innerHTML = '';
+            consequenceCol.innerHTML = '';
+
+            // Mezclar listas para que no queden en el mismo orden lineal
+            const causes = causeEffectPairs.filter(p => p.type === 'cause').sort(() => Math.random() - 0.5);
+            const consequences = causeEffectPairs.filter(p => p.type === 'consequence').sort(() => Math.random() - 0.5);
+
+            causes.forEach(cause => {
+                const div = document.createElement('div');
+                div.id = `cause-item-${cause.id}`;
+                div.className = "p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-emerald-500 transition-all text-xs md:text-sm font-semibold text-slate-700 flex items-center justify-between";
+                div.innerHTML = `<span>${cause.text}</span> <i class="fa-solid fa-link text-slate-300 ml-2"></i>`;
+                div.onclick = () => selectCause(cause.id, div);
+                causeCol.appendChild(div);
+            });
+
+            consequences.forEach(conseq => {
+                const div = document.createElement('div');
+                div.id = `conseq-item-${conseq.id}`;
+                div.className = "p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-teal-500 transition-all text-xs md:text-sm font-semibold text-slate-700 flex items-center justify-between";
+                div.innerHTML = `<span>${conseq.text}</span> <i class="fa-solid fa-link-slash text-slate-300 ml-2"></i>`;
+                div.onclick = () => selectConsequence(conseq.id, div);
+                consequenceCol.appendChild(div);
+            });
+        }
+
+        function selectCause(id, element) {
+            // Deseleccionar causas previas
+            const allCauses = document.getElementById('cause-column').children;
+            for(let child of allCauses) {
+                if(!child.classList.contains('bg-emerald-100')) {
+                    child.className = "p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-emerald-500 transition-all text-xs md:text-sm font-semibold text-slate-700 flex items-center justify-between";
+                }
+            }
+
+            if(element.classList.contains('bg-emerald-100')) return; // Ya emparejado
+
+            selectedCauseId = id;
+            element.className = "p-4 bg-emerald-50 border-2 border-emerald-500 rounded-xl cursor-pointer transition-all text-xs md:text-sm font-bold text-emerald-800 flex items-center justify-between";
+            
+            checkMatch();
+        }
+
+        function selectConsequence(id, element) {
+            // Deseleccionar consecuencias previas
+            const allConseqs = document.getElementById('consequence-column').children;
+            for(let child of allConseqs) {
+                if(!child.classList.contains('bg-teal-100')) {
+                    child.className = "p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-teal-500 transition-all text-xs md:text-sm font-semibold text-slate-700 flex items-center justify-between";
+                }
+            }
+
+            if(element.classList.contains('bg-teal-100')) return; // Ya emparejado
+
+            selectedConsequenceId = id;
+            element.className = "p-4 bg-teal-50 border-2 border-teal-500 rounded-xl cursor-pointer transition-all text-xs md:text-sm font-bold text-teal-800 flex items-center justify-between";
+
+            checkMatch();
+        }
+
+        function checkMatch() {
+            if(selectedCauseId !== null && selectedConsequenceId !== null) {
+                const feedbackEl = document.getElementById('matching-feedback');
+                feedbackEl.classList.remove('hidden');
+
+                if(selectedCauseId === selectedConsequenceId) {
+                    // ¡Correcto!
+                    const causeCard = document.getElementById(`cause-item-${selectedCauseId}`);
+                    const conseqCard = document.getElementById(`conseq-item-${selectedConsequenceId}`);
+
+                    causeCard.className = "p-4 bg-emerald-100 border border-emerald-400 rounded-xl text-xs md:text-sm font-bold text-emerald-800 flex items-center justify-between pointer-events-none";
+                    causeCard.querySelector('i').className = "fa-solid fa-circle-check text-emerald-600";
+
+                    conseqCard.className = "p-4 bg-teal-100 border border-teal-400 rounded-xl text-xs md:text-sm font-bold text-teal-800 flex items-center justify-between pointer-events-none";
+                    conseqCard.querySelector('i').className = "fa-solid fa-circle-check text-teal-600";
+
+                    feedbackEl.className = "mt-6 p-4 rounded-xl text-center font-bold text-sm bg-emerald-50 text-emerald-800 fade-in";
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-link"></i> ¡Excelente Emparejamiento! Has conectado la causa y el efecto real del calentamiento global.`;
+
+                    updatePoints(70);
+                    matchedPairsCount++;
+
+                    if(matchedPairsCount === 4) {
+                        unlockBadge("Analista del Cambio");
+                        document.getElementById('matching-next-btn').classList.remove('hidden');
+                    }
+                } else {
+                    // Falló
+                    feedbackEl.className = "mt-6 p-4 rounded-xl text-center font-bold text-sm bg-rose-100 text-rose-800 fade-in";
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-link-slash"></i> Esa consecuencia no corresponde lógicamente con la causa. Inténtalo de nuevo.`;
+                    
+                    // Resetear bordes después de un segundo
+                    const failCause = selectedCauseId;
+                    const failConseq = selectedConsequenceId;
+                    setTimeout(() => {
+                        const causeCard = document.getElementById(`cause-item-${failCause}`);
+                        const conseqCard = document.getElementById(`conseq-item-${failConseq}`);
+                        if(causeCard && !causeCard.classList.contains('bg-emerald-100')) {
+                            causeCard.className = "p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-emerald-500 transition-all text-xs md:text-sm font-semibold text-slate-700 flex items-center justify-between";
+                        }
+                        if(conseqCard && !conseqCard.classList.contains('bg-teal-100')) {
+                            conseqCard.className = "p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-teal-500 transition-all text-xs md:text-sm font-semibold text-slate-700 flex items-center justify-between";
+                        }
+                    }, 1000);
+                }
+
+                // Limpiar selecciones
+                selectedCauseId = null;
+                selectedConsequenceId = null;
+            }
+        }
+
+        // --- CONTROL DE CASO DE ESTUDIO (FASE 5) ---
+        function goToCaseStudy() {
+            goToScreen('screen-case');
+            updateProgressBar(70);
+        }
+
+        function selectCaseOption(optionLetter) {
+            // Deseleccionar todas visualmente
+            const options = ['A', 'B', 'C'];
+            options.forEach(opt => {
+                document.getElementById(`case-opt-${opt}`).className = "clickable-card bg-white border border-slate-200 p-5 rounded-2xl cursor-pointer transition-all flex items-start gap-4";
+                document.getElementById(`case-badge-${opt}`).className = "w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-700 shrink-0";
+            });
+
+            // Resaltar seleccionada
+            const activeCard = document.getElementById(`case-opt-${optionLetter}`);
+            const activeBadge = document.getElementById(`case-badge-${optionLetter}`);
+            
+            const feedbackEl = document.getElementById('case-feedback');
+            feedbackEl.classList.remove('hidden');
+
+            if(optionLetter === 'B') {
+                // Opción Correcta (Sostenibilidad Real)
+                activeCard.className = "clickable-card bg-emerald-50 border-2 border-emerald-500 p-5 rounded-2xl cursor-pointer transition-all flex items-start gap-4";
+                activeBadge.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold shrink-0";
+
+                feedbackEl.className = "p-5 rounded-2xl mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 fade-in";
+                feedbackEl.innerHTML = `
+                    <h4 class="font-extrabold text-base mb-1"><i class="fa-solid fa-medal"></i> ¡Resolución Sostenible Correcta!</h4>
+                    <p class="text-xs leading-relaxed">
+                        Excelente decisión. Al organizar jornadas comunitarias y sembrar especies nativas (reforestación de ribera), proteges el agua de forma duradera y creas conciencia en la comunidad. Las vallas aseguran que los vecinos conozcan el peligro y colaboren con el cuidado.
+                    </p>
+                `;
+                updatePoints(100);
+                document.getElementById('case-next-btn').classList.remove('hidden');
+            } else if (optionLetter === 'A') {
+                activeCard.className = "clickable-card bg-rose-50 border-2 border-rose-400 p-5 rounded-2xl cursor-pointer transition-all flex items-start gap-4";
+                activeBadge.className = "w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center font-bold shrink-0";
+
+                feedbackEl.className = "p-5 rounded-2xl mb-6 bg-rose-50 border border-rose-200 text-rose-800 fade-in";
+                feedbackEl.innerHTML = `
+                    <h4 class="font-extrabold text-base mb-1"><i class="fa-solid fa-triangle-exclamation"></i> No es la solución ideal</h4>
+                    <p class="text-xs leading-relaxed">
+                        Construir cercas de cemento y proveer botellas plásticas genera dos problemas: primero, las botellas plásticas de un solo uso aumentarán drásticamente los residuos de la vereda, empeorando el cambio climático; segundo, esconder el problema detrás de un muro no repara el agua ya contaminada. ¡Prueba otra opción!
+                    </p>
+                `;
+                updatePoints(10);
+            } else {
+                activeCard.className = "clickable-card bg-amber-50 border-2 border-amber-400 p-5 rounded-2xl cursor-pointer transition-all flex items-start gap-4";
+                activeBadge.className = "w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold shrink-0";
+
+                feedbackEl.className = "p-5 rounded-2xl mb-6 bg-amber-50 border border-amber-200 text-amber-800 fade-in";
+                feedbackEl.innerHTML = `
+                    <h4 class="font-extrabold text-base mb-1"><i class="fa-solid fa-clock"></i> Una solución pasiva e ineficiente</h4>
+                    <p class="text-xs leading-relaxed">
+                        Esperar indefinidamente a soluciones de altos presupuestos de la Alcaldía deja a las familias consumiendo agua nociva durante meses o años. Cancelar clases afecta severamente el derecho de educación. Los jóvenes pueden liderar cambios inmediatos con bajo costo. ¡Elige una opción activa!
+                    </p>
+                `;
+                updatePoints(20);
+            }
+        }
+
+        // --- CONTROL DE DEBATE VIRTUAL (FASE 6) ---
+        function goToDebate() {
+            goToScreen('screen-debate');
+            updateProgressBar(84);
+        }
+
+        function selectDebateStance(stance) {
+            debateStanceSelected = stance;
+
+            // Desmarcar todas
+            document.getElementById('stance-favor').className = "clickable-card border border-slate-200 p-4 rounded-xl cursor-pointer text-center hover:border-emerald-500 bg-white";
+            document.getElementById('stance-moderada').className = "clickable-card border border-slate-200 p-4 rounded-xl cursor-pointer text-center hover:border-emerald-500 bg-white";
+            document.getElementById('stance-contra').className = "clickable-card border border-slate-200 p-4 rounded-xl cursor-pointer text-center hover:border-emerald-500 bg-white";
+
+            // Marcar activa
+            let activeEl = document.getElementById(`stance-${stance}`);
+            if(stance === 'favor') activeEl.className = "clickable-card border-2 border-emerald-500 bg-emerald-50 p-4 rounded-xl cursor-pointer text-center font-bold text-emerald-800";
+            if(stance === 'moderada') activeEl.className = "clickable-card border-2 border-amber-500 bg-amber-50 p-4 rounded-xl cursor-pointer text-center font-bold text-amber-800";
+            if(stance === 'contra') activeEl.className = "clickable-card border-2 border-rose-500 bg-rose-50 p-4 rounded-xl cursor-pointer text-center font-bold text-rose-800";
+
+            document.getElementById('debate-input-container').classList.remove('hidden');
+        }
+
+        function submitDebateArgument() {
+            const argText = document.getElementById('debate-argument').value.trim();
+            if(argText.length < 15) {
+                alert("Por favor, ingresa una justificación más completa (mínimo 15 letras) para enriquecer el debate de la escuela.");
+                return;
+            }
+
+            // Ocultar zona de entrada de texto
+            document.getElementById('debate-input-container').classList.add('hidden');
+
+            // Cargar simulación de respuestas de otros alumnos
+            const chatbox = document.getElementById('debate-chatbox');
+            chatbox.classList.remove('hidden');
+
+            const chatLines = document.getElementById('debate-chat-lines');
+            chatLines.innerHTML = '';
+
+            // Respuesta personalizada del usuario
+            let userStanceLabel = debateStanceSelected === 'favor' ? 'A Favor' : (debateStanceSelected === 'contra' ? 'Crítico/En Contra' : 'Punto Medio');
+            let userStanceClass = debateStanceSelected === 'favor' ? 'bg-emerald-100 text-emerald-800' : (debateStanceSelected === 'contra' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800');
+
+            const userLine = `
+                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-slate-800 text-xs">${playerName} <span class="font-normal text-slate-400">(Tú)</span></span>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${userStanceClass}">${userStanceLabel}</span>
+                    </div>
+                    <p class="text-xs text-slate-600 italic">"${argText}"</p>
+                </div>
+            `;
+
+            // Respuestas simuladas de compañeros colombianos
+            const mockResponses = [
+                { name: "Camilo Ortiz (Chinchiná, Caldas)", stance: "A Favor", stanceClass: "bg-emerald-100 text-emerald-800", text: "Es justo lo que necesitamos. En mi casa ya no usamos bolsas plásticas de un solo uso y en la escuela deberíamos dar el ejemplo, aunque el sándwich suba 200 pesos." },
+                { name: "Mariana Restrepo (Bucaramanga)", stance: "Transición", stanceClass: "bg-amber-100 text-amber-800", text: "Estoy de acuerdo con prohibirlos pero de forma planificada. La tienda escolar puede dar descuentos a quienes traigan su propio portacomida reusable." },
+                { name: "Mateo Urrego (Bogotá)", stance: "En Contra", stanceClass: "bg-rose-100 text-rose-800", text: "Entiendo que el plástico daña los ríos, pero si suben los precios de la comida escolar, muchos compañeros de grados inferiores no tendrán suficiente para desayunar en el descanso." }
+            ];
+
+            let html = userLine;
+            mockResponses.forEach(r => {
+                html += `
+                    <div class="bg-white/80 p-3 rounded-xl border border-slate-100 shadow-sm">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-bold text-slate-700 text-xs">${r.name}</span>
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${r.stanceClass}">${r.stance}</span>
+                        </div>
+                        <p class="text-xs text-slate-500 italic">"${r.text}"</p>
+                    </div>
+                `;
+            });
+
+            chatLines.innerHTML = html;
+            updatePoints(80);
+            unlockBadge("Líder de Opinión");
+
+            // Mostrar botón siguiente
+            document.getElementById('debate-next-btn').classList.remove('hidden');
+        }
+
+        // --- CONTROL DE COMPROMISO ECOLÓGICO (FASE 7) ---
+        function goToCommitment() {
+            goToScreen('screen-commitment');
+            updateProgressBar(95);
+        }
+
+        function selectCommitmentOption(id) {
+            // Deseleccionar previas
+            for(let i=1; i<=4; i++) {
+                document.getElementById(`commit-${i}`).className = "border border-slate-200 hover:border-emerald-500 p-4 rounded-xl cursor-pointer transition-all flex items-center gap-3 bg-white";
+            }
+
+            // Seleccionar activa
+            const activeEl = document.getElementById(`commit-${id}`);
+            activeEl.className = "border-2 border-emerald-500 bg-emerald-50 p-4 rounded-xl cursor-pointer transition-all flex items-center gap-3 font-bold text-emerald-900";
+            selectedCommitment = activeEl.querySelector('span').innerText;
+        }
+
+        function finishEcoChallenge() {
+            if(!selectedCommitment) {
+                alert("Por favor, haz clic y escoge al menos uno de los compromisos ecológicos antes de continuar.");
+                return;
+            }
+
+            // Parar temporizador
+            if(timerInterval) clearInterval(timerInterval);
+
+            // Calcular Resultados Finales
+            goToScreen('screen-results');
+            updateProgressBar(100);
+
+            // Generar nivel ambiental
+            let finalRank = "";
+            let rankDesc = "";
+            let rankIcon = "";
+
+            if(ecoPoints >= 450) {
+                finalRank = "Héroe del Planeta 🌟";
+                rankDesc = "¡Espectacular! Tienes una comprensión excepcional del cambio climático, las leyes colombianas de clasificación de residuos y el liderazgo ambiental participativo. Eres el cambio que el mundo necesita.";
+                rankIcon = "fa-shield-heart text-amber-500";
+            } else if(ecoPoints >= 300) {
+                finalRank = "Guardián Ambiental 🌿";
+                rankDesc = "¡Gran trabajo! Demuestras un compromiso sólido y conocimientos claros sobre el reciclaje y los problemas globales del medio ambiente. Siguiendo así serás un referente escolar.";
+                rankIcon = "fa-tree-deciduous text-emerald-500";
+            } else {
+                finalRank = "Explorador Verde 🌱";
+                rankDesc = "¡Buen inicio! Estás comenzando a comprender los retos ecológicos de nuestra era. Continúa investigando y aplicando pequeñas acciones cotidianas para subir de nivel.";
+                rankIcon = "fa-compass text-teal-500";
+            }
+
+            // Rellenar datos en la interfaz
+            document.getElementById('level-title').innerText = finalRank;
+            document.getElementById('level-desc').innerText = rankDesc;
+            document.getElementById('level-icon').className = `fa-solid ${rankIcon}`;
+
+            document.getElementById('final-points').innerText = ecoPoints;
+            document.getElementById('final-badges').innerText = `${badgesUnlocked.length}/4`;
+            
+            // Tiempo usado
+            const timeUsedSecs = 300 - timerSeconds;
+            const mins = Math.floor(timeUsedSecs / 60);
+            const secs = timeUsedSecs % 60;
+            document.getElementById('final-time').innerText = timerActive ? `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}` : "Sin tiempo";
+
+            // Rellenar Diploma
+            document.getElementById('diploma-name').innerText = playerName;
+            document.getElementById('diploma-rank').innerText = finalRank;
+            document.getElementById('diploma-commitment').innerText = `"${selectedCommitment}"`;
+
+            // Lluvia masiva de confeti por haber salvado el reto
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // --- SISTEMA DE REINTENTO ---
+        function resetChallenge() {
+            playerName = "";
+            currentStep = 0;
+            ecoPoints = 0;
+            badgesUnlocked = [];
+            timerSeconds = 300;
+            currentQuestionIdx = 0;
+            triviaScore = 0;
+            currentSortingIdx = 0;
+            matchedPairsCount = 0;
+            selectedCauseId = null;
+            selectedConsequenceId = null;
+            debateStanceSelected = "";
+            selectedCommitment = "";
+
+            if(timerInterval) clearInterval(timerInterval);
+
+            // Restaurar inputs
+            document.getElementById('player-name').value = "";
+            document.getElementById('timer-toggle').checked = false;
+            document.getElementById('debate-argument').value = "";
+
+            // Ocultar cabecera e ir a pantalla inicial
+            document.getElementById('global-header').classList.add('hidden');
+            document.getElementById('timer-container').className = "hidden flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1.5 rounded-full text-sm font-semibold";
+            document.getElementById('current-badge-display').classList.add('hidden');
+
+            goToScreen('screen-welcome');
+        }
+    </script>
+</body>
+</html>
