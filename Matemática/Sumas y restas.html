@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aventura Matemática - 2° Primaria</title>
+    <!-- Tailwind CSS para el diseño responsivo y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Quicksand (Tipografía amigable e infantil) -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f0fdf4; /* Fondo verde pastel sutil */
+        }
+        .bouncy-btn:active {
+            transform: scale(0.95);
+        }
+        /* Animación para respuestas correctas */
+        @keyframes success-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); box-shadow: 0 0 20px #22c55e; }
+        }
+        .correct-answer-anim {
+            animation: success-pulse 0.6s ease-in-out;
+        }
+        /* Animación de confeti */
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #f39c12;
+            opacity: 0.8;
+            border-radius: 50%;
+            animation: fall 3s linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-10px) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Encabezado de la Actividad -->
+    <header class="bg-gradient-to-r from-teal-400 via-emerald-400 to-cyan-400 shadow-md text-white py-6 px-4 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_20%,transparent_20%)] [background-size:16px_16px]"></div>
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center relative z-10 gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-4xl md:text-5xl animate-bounce">🧮</span>
+                <div>
+                    <h1 class="text-2xl md:text-3.5xl font-bold tracking-wide">¡Aventura de Sumas y Restas!</h1>
+                    <p class="text-sm md:text-base text-teal-900 font-semibold">Grado Segundo (2°) - Primaria Colombia 🇨🇴</p>
+                </div>
+            </div>
+            <!-- Identificación del Estudiante -->
+            <div class="bg-white/90 text-teal-950 px-4 py-2 rounded-2xl shadow-inner flex items-center gap-2 border border-teal-200">
+                <span class="text-xl">⭐</span>
+                <div>
+                    <label for="studentName" class="block text-xs font-bold uppercase text-teal-700">Tu Nombre de Aventurero:</label>
+                    <input type="text" id="studentName" placeholder="Escribe aquí tu nombre..." 
+                           class="bg-transparent border-b border-teal-400 focus:outline-none focus:border-teal-600 font-bold text-sm w-44"
+                           oninput="updateStudentNameInDiploma()">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegación por Pestañas Pedagógicas -->
+    <nav class="bg-white border-b border-emerald-100 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 py-2 flex justify-around gap-2 overflow-x-auto">
+            <button onclick="switchTab('tutorial')" id="btn-tutorial" class="flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition-all duration-300 bg-emerald-500 text-white shadow-md">
+                <span>📚</span> Aprendo Primero
+            </button>
+            <button onclick="switchTab('practice')" id="btn-practice" class="flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition-all duration-300 text-emerald-600 hover:bg-emerald-50">
+                <span>➕</span> Practica y Suma
+            </button>
+            <button onclick="switchTab('challenges')" id="btn-challenges" class="flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition-all duration-300 text-emerald-600 hover:bg-emerald-50">
+                <span>🎯</span> Retos Diarios
+            </button>
+            <button onclick="switchTab('results')" id="btn-results" class="flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition-all duration-300 text-emerald-600 hover:bg-emerald-50">
+                <span>🏆</span> Mi Logro
+            </button>
+        </div>
+    </nav>
+
+    <!-- Área de Contenido Principal -->
+    <main class="max-w-6xl mx-auto p-4 md:p-6 w-full flex-grow">
+
+        <!-- SECCIÓN 1: APRENDO PRIMERO -->
+        <section id="section-tutorial" class="space-y-8 animate-fade-in">
+            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-200 p-6 rounded-3xl shadow-md">
+                <h2 class="text-2xl font-bold text-orange-700 flex items-center gap-2 mb-4">
+                    <span>🌟</span> ¿Qué aprenderemos hoy, supercampeón?
+                </h2>
+                <p class="text-lg leading-relaxed text-slate-700">
+                    Hoy vamos a dominar el superpoder de las <strong>Sumas (Adiciones)</strong> y las <strong>Restas (Sustracciones)</strong> de 2 y 3 cifras. 
+                    Aprender matemáticas es como jugar: ¡solo necesitas seguir los pasos y practicar con alegría!
+                </p>
+            </div>
+
+            <!-- El Concepto de Sumar -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-3xl shadow-md border border-sky-100 p-6 hover:shadow-lg transition-shadow">
+                    <span class="bg-sky-100 text-sky-700 text-xs font-bold px-3 py-1 rounded-full uppercase">Operación 1</span>
+                    <h3 class="text-xl font-bold text-sky-700 mt-2 flex items-center gap-2">
+                        <span>➕</span> ¡Sumar es Juntar y Agrupar!
+                    </h3>
+                    <p class="text-sm text-slate-600 mt-2">
+                        Cuando sumamos, reunimos dos o más cantidades para saber cuántas tenemos en total.
+                    </p>
+
+                    <!-- Animación/Paso interactivo de Suma de 2 cifras -->
+                    <div class="mt-6 bg-sky-50 p-4 rounded-2xl border border-sky-100">
+                        <h4 class="font-bold text-sky-800 text-sm mb-3">Ejemplo: <span class="bg-white px-2 py-1 rounded-lg border border-sky-200">45 + 23</span></h4>
+                        
+                        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                            <!-- Tabla de Valor Posicional -->
+                            <table class="w-full max-w-[200px] text-center border-collapse bg-white rounded-xl overflow-hidden shadow-sm">
+                                <thead>
+                                    <tr class="bg-sky-200 text-sky-950 text-xs font-bold">
+                                        <th class="p-2 border border-sky-100">D <span class="text-[10px] block font-normal">(Decenas)</span></th>
+                                        <th class="p-2 border border-sky-100">U <span class="text-[10px] block font-normal">(Unidades)</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="font-bold text-base text-slate-800">
+                                    <tr>
+                                        <td class="p-2 border border-sky-100 text-rose-500">4</td>
+                                        <td class="p-2 border border-sky-100 text-blue-500">5</td>
+                                    </tr>
+                                    <tr class="border-b-2 border-sky-400">
+                                        <td class="p-2 border border-sky-100 text-rose-500">+ 2</td>
+                                        <td class="p-2 border border-sky-100 text-blue-500">3</td>
+                                    </tr>
+                                    <tr class="bg-sky-50 text-lg">
+                                        <td class="p-2 border border-sky-100 text-rose-600">6</td>
+                                        <td class="p-2 border border-sky-100 text-blue-600">8</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="text-xs text-slate-600 space-y-2 max-w-xs">
+                                <p><strong>Paso 1:</strong> Sumamos las <strong>Unidades</strong> (azul): <br><span class="text-blue-600 font-bold">5 + 3 = 8</span>. Escribimos el 8 abajo.</p>
+                                <p><strong>Paso 2:</strong> Sumamos las <strong>Decenas</strong> (rojo): <br><span class="text-rose-600 font-bold">4 + 2 = 6</span>. ¡Listo! El resultado es <strong>68</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- El Concepto de Restar -->
+                <div class="bg-white rounded-3xl shadow-md border border-rose-100 p-6 hover:shadow-lg transition-shadow">
+                    <span class="bg-rose-100 text-rose-700 text-xs font-bold px-3 py-1 rounded-full uppercase">Operación 2</span>
+                    <h3 class="text-xl font-bold text-rose-700 mt-2 flex items-center gap-2">
+                        <span>➖</span> ¡Restar es Quitar y Comparar!
+                    </h3>
+                    <p class="text-sm text-slate-600 mt-2">
+                        Cuando restamos, le quitamos una cantidad a otra que ya tenemos para ver cuánto nos queda.
+                    </p>
+
+                    <!-- Animación/Paso interactivo de Resta de 2 cifras -->
+                    <div class="mt-6 bg-rose-50 p-4 rounded-2xl border border-rose-100">
+                        <h4 class="font-bold text-rose-800 text-sm mb-3">Ejemplo: <span class="bg-white px-2 py-1 rounded-lg border border-rose-200">78 - 34</span></h4>
+                        
+                        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                            <!-- Tabla de Valor Posicional -->
+                            <table class="w-full max-w-[200px] text-center border-collapse bg-white rounded-xl overflow-hidden shadow-sm">
+                                <thead>
+                                    <tr class="bg-rose-200 text-rose-950 text-xs font-bold">
+                                        <th class="p-2 border border-rose-100">D <span class="text-[10px] block font-normal">(Decenas)</span></th>
+                                        <th class="p-2 border border-rose-100">U <span class="text-[10px] block font-normal">(Unidades)</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="font-bold text-base text-slate-800">
+                                    <tr>
+                                        <td class="p-2 border border-rose-100 text-rose-500">7</td>
+                                        <td class="p-2 border border-rose-100 text-blue-500">8</td>
+                                    </tr>
+                                    <tr class="border-b-2 border-rose-400">
+                                        <td class="p-2 border border-rose-100 text-rose-500">- 3</td>
+                                        <td class="p-2 border border-rose-100 text-blue-500">4</td>
+                                    </tr>
+                                    <tr class="bg-rose-50 text-lg">
+                                        <td class="p-2 border border-rose-100 text-rose-600">4</td>
+                                        <td class="p-2 border border-rose-100 text-blue-600">4</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="text-xs text-slate-600 space-y-2 max-w-xs">
+                                <p><strong>Paso 1:</strong> Restamos las <strong>Unidades</strong> (azul): <br>A <span class="text-blue-600 font-bold">8</span> le quitamos <span class="text-blue-400 font-bold">4</span>, nos quedan <span class="text-blue-600 font-bold">4</span>.</p>
+                                <p><strong>Paso 2:</strong> Restamos las <strong>Decenas</strong> (rojo): <br>A <span class="text-rose-600 font-bold">7</span> le quitamos <span class="text-rose-400 font-bold">3</span>, nos quedan <span class="text-rose-600 font-bold">4</span>. ¡La respuesta es <strong>44</strong>!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo de 3 Cifras Llevando y Prestando -->
+            <div class="bg-white rounded-3xl shadow-md border border-emerald-100 p-6">
+                <h3 class="text-xl font-bold text-emerald-800 mb-4 flex items-center gap-2">
+                    <span>🚀</span> ¿Y cómo sumamos y restamos números de 3 cifras?
+                </h3>
+                <p class="text-sm text-slate-600 mb-6">
+                    ¡Es igual de fácil! Solo agregamos una columna nueva: la de las <strong>Centenas (C)</strong>. Recuerda el orden de derecha a izquierda: 
+                    primero Unidades, luego Decenas y finalmente Centenas.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Suma Llevando de 3 Cifras -->
+                    <div class="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="bg-indigo-600 text-white rounded-full text-xs px-2 py-0.5 font-bold">A</span>
+                            <h4 class="font-bold text-indigo-950 text-base">La Suma "Llevando" (Agrupando)</h4>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-4">Cuando en una columna el total es de 10 o más, dejamos la unidad abajo y "llevamos" la decena a la siguiente columna izquierda.</p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4 items-center justify-around">
+                            <table class="w-full max-w-[240px] text-center border-collapse bg-white rounded-xl overflow-hidden shadow-sm">
+                                <thead>
+                                    <tr class="bg-indigo-100 text-indigo-950 text-xs font-bold">
+                                        <th class="p-1.5 border border-indigo-50">C <span class="text-[9px] block font-normal">(Verde)</span></th>
+                                        <th class="p-1.5 border border-indigo-50">D <span class="text-[9px] block font-normal">(Rojo)</span></th>
+                                        <th class="p-1.5 border border-indigo-50">U <span class="text-[9px] block font-normal">(Azul)</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="font-bold text-sm text-slate-800">
+                                    <tr class="text-[11px] text-orange-600 bg-orange-50/50">
+                                        <td class="p-1 border border-indigo-50"></td>
+                                        <td class="p-1 border border-indigo-50">1 <span class="text-[8px] font-bold block">(Llevo)</span></td>
+                                        <td class="p-1 border border-indigo-50"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2 border border-indigo-50 text-emerald-600">2</td>
+                                        <td class="p-2 border border-indigo-50 text-rose-500">4</td>
+                                        <td class="p-2 border border-indigo-50 text-blue-500">8</td>
+                                    </tr>
+                                    <tr class="border-b-2 border-indigo-400">
+                                        <td class="p-2 border border-indigo-50 text-emerald-600">+ 1</td>
+                                        <td class="p-2 border border-indigo-50 text-rose-500">2</td>
+                                        <td class="p-2 border border-indigo-50 text-blue-500">5</td>
+                                    </tr>
+                                    <tr class="bg-indigo-50 font-extrabold text-base">
+                                        <td class="p-2 border border-indigo-50 text-emerald-700">3</td>
+                                        <td class="p-2 border border-indigo-50 text-rose-700">7</td>
+                                        <td class="p-2 border border-indigo-50 text-blue-700">3</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="text-xs text-slate-600 space-y-1.5 max-w-xs">
+                                <p><strong>1. Unidades:</strong> 8 + 5 = 13. Colocas el 3 abajo y "llevas" 1 a las decenas.</p>
+                                <p><strong>2. Decenas:</strong> Sumas el 1 que llevabas: 1 + 4 + 2 = 7.</p>
+                                <p><strong>3. Centenas:</strong> Sumas las centenas: 2 + 1 = 3. Total: <strong>373</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resta Prestando de 3 Cifras -->
+                    <div class="bg-amber-50/50 p-5 rounded-2xl border border-amber-100">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="bg-amber-600 text-white rounded-full text-xs px-2 py-0.5 font-bold">B</span>
+                            <h4 class="font-bold text-amber-950 text-base">La Resta "Prestando" (Desagrupando)</h4>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-4">Si el número de arriba es menor que el de abajo, le pide prestada 1 decena a su vecino izquierdo para volverse fuerte.</p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4 items-center justify-around">
+                            <table class="w-full max-w-[240px] text-center border-collapse bg-white rounded-xl overflow-hidden shadow-sm">
+                                <thead>
+                                    <tr class="bg-amber-100 text-amber-950 text-xs font-bold">
+                                        <th class="p-1.5 border border-amber-50">C <span class="text-[9px] block font-normal">(Verde)</span></th>
+                                        <th class="p-1.5 border border-amber-50">D <span class="text-[9px] block font-normal">(Rojo)</span></th>
+                                        <th class="p-1.5 border border-amber-50">U <span class="text-[9px] block font-normal">(Azul)</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="font-bold text-sm text-slate-800">
+                                    <tr class="text-[11px] text-red-600 bg-red-50/50">
+                                        <td class="p-1 border border-amber-50"></td>
+                                        <td class="p-1 border border-amber-50">Queda en 3</td>
+                                        <td class="p-1 border border-amber-50">Se vuelve 12</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2 border border-amber-50 text-emerald-600">5</td>
+                                        <td class="p-2 border border-amber-50 text-rose-500">4</td>
+                                        <td class="p-2 border border-amber-50 text-blue-500">2</td>
+                                    </tr>
+                                    <tr class="border-b-2 border-amber-400">
+                                        <td class="p-2 border border-amber-50 text-emerald-600">- 2</td>
+                                        <td class="p-2 border border-amber-50 text-rose-500">1</td>
+                                        <td class="p-2 border border-amber-50 text-blue-500">7</td>
+                                    </tr>
+                                    <tr class="bg-amber-50 font-extrabold text-base">
+                                        <td class="p-2 border border-amber-50 text-emerald-700">3</td>
+                                        <td class="p-2 border border-amber-50 text-rose-700">2</td>
+                                        <td class="p-2 border border-amber-50 text-blue-700">5</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="text-xs text-slate-600 space-y-1.5 max-w-xs">
+                                <p><strong>1. Unidades:</strong> ¿A 2 le podemos quitar 7? ¡No! La decena le presta 1 y el 2 se convierte en 12. 12 - 7 = 5.</p>
+                                <p><strong>2. Decenas:</strong> El 4 prestó una, así que quedó en 3. Restas: 3 - 1 = 2.</p>
+                                <p><strong>3. Centenas:</strong> Restas: 5 - 2 = 3. Total: <strong>325</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón Motivador para ir a practicar -->
+            <div class="text-center py-4">
+                <button onclick="switchTab('practice')" class="bouncy-btn bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg px-8 py-4 rounded-2xl shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                    🚀 ¡Súper! Estoy listo para practicar y ganar estrellas
+                </button>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: PRÁCTICA INTERACTIVA -->
+        <section id="section-practice" class="hidden space-y-6 animate-fade-in">
+            <div class="bg-white rounded-3xl p-6 shadow-md border border-emerald-100">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-emerald-800 flex items-center gap-2">
+                            <span>🧮</span> Tus Retos Matemáticos
+                        </h2>
+                        <p class="text-sm text-slate-600">Completa cada una de las siguientes operaciones. ¡Escribe tus respuestas y sorpréndenos!</p>
+                    </div>
+                    <!-- Filtro para facilitar el juego de los niños -->
+                    <div class="flex gap-2 flex-wrap bg-emerald-50 p-1.5 rounded-xl border border-emerald-100">
+                        <button onclick="filterPractice('all')" id="btn-filter-all" class="px-4 py-2 text-xs font-bold rounded-lg transition-all bg-emerald-500 text-white shadow-sm">Todas (40)</button>
+                        <button onclick="filterPractice('add2')" id="btn-filter-add2" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-emerald-700 hover:bg-white/50">Sumas de 2 Cifras (10)</button>
+                        <button onclick="filterPractice('add3')" id="btn-filter-add3" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-emerald-700 hover:bg-white/50">Sumas de 3 Cifras (10)</button>
+                        <button onclick="filterPractice('sub2')" id="btn-filter-sub2" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-emerald-700 hover:bg-white/50">Restas de 2 Cifras (10)</button>
+                        <button onclick="filterPractice('sub3')" id="btn-filter-sub3" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-emerald-700 hover:bg-white/50">Restas de 3 Cifras (10)</button>
+                    </div>
+                </div>
+
+                <!-- Panel de Puntuación en Vivo -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-white p-4 rounded-2xl shadow-inner text-center">
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-wider opacity-90">Resueltas</div>
+                        <div id="live-resolved" class="text-2xl font-bold">0 / 40</div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-wider opacity-90">Aciertos ⭐</div>
+                        <div id="live-success" class="text-2xl font-bold">0</div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-wider opacity-90">Progreso</div>
+                        <div id="live-progress-pct" class="text-2xl font-bold">0%</div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-wider opacity-90">Nota Actual</div>
+                        <div id="live-rating" class="text-2xl font-bold">---</div>
+                    </div>
+                </div>
+
+                <!-- Contenedor Grid de Operaciones -->
+                <div id="operations-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    <!-- Dinámicamente inyectados desde JS -->
+                </div>
+
+                <!-- Controles del Tablero de Prácticas -->
+                <div class="mt-8 pt-6 border-t border-emerald-100 flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <button onclick="verifyPractice()" class="bouncy-btn bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-3.5 rounded-2xl shadow-lg transition-all duration-300 w-full sm:w-auto">
+                        ✅ Verificar Respuestas
+                    </button>
+                    <button onclick="regeneratePractice()" class="bouncy-btn bg-amber-500 hover:bg-amber-600 text-white font-bold px-8 py-3.5 rounded-2xl shadow-md transition-all duration-300 w-full sm:w-auto">
+                        🔄 Nuevos Ejercicios
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: RETO MATEMÁTICO (Problemas de la vida real) -->
+        <section id="section-challenges" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 shadow-md border border-cyan-100">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-cyan-800 flex items-center gap-2">
+                        <span>🎯</span> Retos Matemáticos del Día
+                    </h2>
+                    <p class="text-sm text-slate-600">Ayuda a nuestros personajes a resolver situaciones cotidianas utilizando sumas y restas de 2 y 3 cifras.</p>
+                </div>
+
+                <!-- Los 5 Problemas Estructurados -->
+                <div class="space-y-6" id="challenges-container">
+                    <!-- Generados dinámicamente o con maquetación interactiva amigable -->
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-cyan-100 flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <button onclick="verifyChallenges()" class="bouncy-btn bg-cyan-500 hover:bg-cyan-600 text-white font-bold px-8 py-3.5 rounded-2xl shadow-lg transition-all duration-300 w-full sm:w-auto">
+                        🎯 Verificar Retos
+                    </button>
+                    <button onclick="resetChallenges()" class="bouncy-btn bg-slate-400 hover:bg-slate-500 text-white font-bold px-8 py-3.5 rounded-2xl shadow-md transition-all duration-300 w-full sm:w-auto">
+                        🔄 Intentar Retos Nuevamente
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: RESULTADO FINAL Y CERTIFICADO -->
+        <section id="section-results" class="hidden space-y-8 animate-fade-in relative">
+            <!-- Contenedor Confeti Animación -->
+            <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl"></div>
+
+            <div class="bg-white rounded-3xl p-8 shadow-xl border border-emerald-100 text-center max-w-2xl mx-auto relative z-10">
+                <h2 class="text-3xl font-extrabold text-slate-800 mb-6 flex justify-center items-center gap-2">
+                    <span>🏆</span> Mi Rendimiento Total
+                </h2>
+
+                <div class="flex flex-col items-center justify-center mb-6">
+                    <!-- Anillo de progreso visual -->
+                    <div class="relative w-40 h-40 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90">
+                            <circle cx="80" cy="80" r="70" stroke="#f1f5f9" stroke-width="12" fill="transparent" />
+                            <circle id="results-ring" cx="80" cy="80" r="70" stroke="#10b981" stroke-width="12" fill="transparent" stroke-dasharray="439.8" stroke-dashoffset="439.8" stroke-linecap="round" class="transition-all duration-1000" />
+                        </svg>
+                        <span id="results-pct" class="absolute text-3xl font-extrabold text-slate-800">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200/60 mb-6">
+                    <h3 class="font-bold text-lg text-slate-700" id="results-greeting">¡Hola, Aventurero!</h3>
+                    <p class="text-sm text-slate-500 mt-1" id="results-summary">Resuelve los ejercicios en las pestañas anteriores para calcular tu resultado final aquí.</p>
+                </div>
+
+                <!-- Mensaje Motivador Basado en el Logro -->
+                <div id="results-message" class="text-base font-semibold py-3 px-5 rounded-xl hidden"></div>
+            </div>
+
+            <!-- El Diploma de Supercampeón (Oculto hasta obtener >= 80%) -->
+            <div id="diploma-wrapper" class="hidden max-w-3xl mx-auto">
+                <div class="bg-amber-50 p-6 md:p-10 rounded-[2.5rem] border-[12px] border-amber-400 shadow-2xl relative overflow-hidden text-center" id="diploma-element">
+                    <!-- Decoración del Diploma -->
+                    <div class="absolute top-0 left-0 w-32 h-32 border-l-[6px] border-t-[6px] border-amber-600 rounded-tl-[1.5rem] m-2 pointer-events-none"></div>
+                    <div class="absolute top-0 right-0 w-32 h-32 border-r-[6px] border-t-[6px] border-amber-600 rounded-tr-[1.5rem] m-2 pointer-events-none"></div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 border-l-[6px] border-b-[6px] border-amber-600 rounded-bl-[1.5rem] m-2 pointer-events-none"></div>
+                    <div class="absolute bottom-0 right-0 w-32 h-32 border-r-[6px] border-b-[6px] border-amber-600 rounded-br-[1.5rem] m-2 pointer-events-none"></div>
+                    
+                    <!-- Elementos gráficos de fondo -->
+                    <div class="absolute -right-12 -top-12 w-48 h-48 bg-amber-200/30 rounded-full blur-2xl"></div>
+                    <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-yellow-200/30 rounded-full blur-2xl"></div>
+
+                    <!-- Cabecera del Diploma -->
+                    <span class="text-5xl block mb-2">🏆</span>
+                    <h3 class="text-amber-800 font-extrabold text-3xl md:text-4.5xl uppercase tracking-widest">Diploma de Honor</h3>
+                    <p class="text-xs text-amber-600 font-bold uppercase tracking-wider mt-1">Concedido con Orgullo y Reconocimiento</p>
+
+                    <div class="my-8">
+                        <p class="text-slate-500 text-sm md:text-base">Certificamos con alegría que el súper aventurero de las matemáticas:</p>
+                        <h4 id="diploma-student-name" class="text-3xl md:text-4.5xl font-extrabold text-teal-700 underline decoration-amber-400 decoration-wavy underline-offset-8 my-4">¡Un Gran Aventurero!</h4>
+                        <p class="text-slate-600 text-sm md:text-base px-6">
+                            Ha resuelto con éxito las operaciones aritméticas de suma y resta de dos y tres cifras, 
+                            demostrando gran destreza, razonamiento lógico y perseverancia de grado 2° de primaria.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center mt-10">
+                        <div class="text-center">
+                            <span class="text-xs text-slate-400 block border-b border-slate-300 pb-2 max-w-[150px] mx-auto">Julio de 2026</span>
+                            <span class="text-[10px] uppercase font-bold text-slate-500">Fecha del Logro</span>
+                        </div>
+                        <div class="flex justify-center my-2 md:my-0">
+                            <!-- Sello Dorado Realizado con CSS -->
+                            <div class="relative w-24 h-24 bg-gradient-to-tr from-yellow-500 to-amber-400 rounded-full flex items-center justify-center shadow-lg border-4 border-amber-300">
+                                <div class="absolute inset-2 border border-dashed border-white rounded-full"></div>
+                                <span class="text-white font-extrabold text-[10px] uppercase tracking-wider text-center relative z-10 leading-tight">Sello de<br>Éxito<br>⭐</span>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-xs text-slate-400 block border-b border-slate-300 pb-2 max-w-[150px] mx-auto">Aventura Matemática</span>
+                            <span class="text-[10px] uppercase font-bold text-slate-500">Firma del Jurado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de impresión del diploma -->
+                <div class="text-center mt-6">
+                    <button onclick="printDiploma()" class="bouncy-btn bg-amber-500 hover:bg-amber-600 text-white font-bold px-8 py-3 rounded-xl shadow-lg transition-all duration-300">
+                        🖨️ Imprimir / Guardar Diploma
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-teal-950 text-teal-200 py-6 px-4 text-center text-xs mt-12 border-t-4 border-emerald-400">
+        <div class="max-w-4xl mx-auto space-y-2">
+            <p class="font-bold text-sm text-teal-100">Diseñado con amor pedagógico para niños creativos ❤️</p>
+            <p>Este sistema utiliza principios de gamificación para fomentar la asimilación del cálculo matemático a temprana edad en la educación básica primaria.</p>
+            <p class="opacity-70">&copy; 2026 - Aventura Matemática Educativa Digital. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Arreglos Globales de Preguntas
+        let practiceList = [];
+        let challengesList = [];
+        let verifiedPractice = false;
+        let verifiedChallenges = false;
+
+        // Generar las operaciones de manera automática
+        window.onload = function() {
+            generatePracticeData();
+            renderPractice();
+            generateChallengesData();
+            renderChallenges();
+            updateLiveStats();
+        };
+
+        function generatePracticeData() {
+            practiceList = [];
+            
+            // 1. 10 Sumas de 2 Cifras
+            for (let i = 0; i < 10; i++) {
+                let n1 = Math.floor(Math.random() * 80) + 10; // 10 a 89
+                let n2 = Math.floor(Math.random() * (99 - n1)) + 5; // Evita sobrepasar 99
+                practiceList.push({
+                    id: `add2-${i}`,
+                    type: 'add2',
+                    num1: n1,
+                    num2: n2,
+                    operator: '+',
+                    correctAnswer: n1 + n2,
+                    userAnswer: '',
+                    status: 'pending' // pending, correct, incorrect
+                });
+            }
+
+            // 2. 10 Sumas de 3 Cifras
+            for (let i = 0; i < 10; i++) {
+                let n1 = Math.floor(Math.random() * 800) + 100; // 100 a 899
+                let n2 = Math.floor(Math.random() * (999 - n1)) + 5; // Evita sobrepasar 999
+                practiceList.push({
+                    id: `add3-${i}`,
+                    type: 'add3',
+                    num1: n1,
+                    num2: n2,
+                    operator: '+',
+                    correctAnswer: n1 + n2,
+                    userAnswer: '',
+                    status: 'pending'
+                });
+            }
+
+            // 3. 10 Restas de 2 Cifras
+            for (let i = 0; i < 10; i++) {
+                let n1 = Math.floor(Math.random() * 80) + 19; // 19 a 99
+                let n2 = Math.floor(Math.random() * (n1 - 10)) + 5; // El sustraendo debe ser menor
+                practiceList.push({
+                    id: `sub2-${i}`,
+                    type: 'sub2',
+                    num1: n1,
+                    num2: n2,
+                    operator: '-',
+                    correctAnswer: n1 - n2,
+                    userAnswer: '',
+                    status: 'pending'
+                });
+            }
+
+            // 4. 10 Restas de 3 Cifras
+            for (let i = 0; i < 10; i++) {
+                let n1 = Math.floor(Math.random() * 800) + 199; // 199 a 999
+                let n2 = Math.floor(Math.random() * (n1 - 100)) + 50; // El sustraendo debe ser menor
+                practiceList.push({
+                    id: `sub3-${i}`,
+                    type: 'sub3',
+                    num1: n1,
+                    num2: n2,
+                    operator: '-',
+                    correctAnswer: n1 - n2,
+                    userAnswer: '',
+                    status: 'pending'
+                });
+            }
+        }
+
+        function generateChallengesData() {
+            // 5 Desafíos contextuales adaptados
+            challengesList = [
+                {
+                    id: 'challenge-1',
+                    title: '🍎 La Tienda de Frutas de Don Pedro',
+                    text: 'Don Pedro tiene en su puesto de frutas de Corabastos <strong>145</strong> sabrosas manzanas rojas. Hoy le trajeron un camión con otras <strong>234</strong> manzanas verdes. ¿Cuántas manzanas tiene en total para vender el día de hoy?',
+                    num1: 145,
+                    num2: 234,
+                    operator: '+',
+                    correctAnswer: 379,
+                    userAnswer: '',
+                    status: 'pending',
+                    clue: 'Como va a juntar más manzanas, ¡tienes que hacer una suma!'
+                },
+                {
+                    id: 'challenge-2',
+                    title: '🦜 Las Aves del Parque Explora',
+                    text: 'En el jardín del Parque Explora en Medellín, había una bandada de <strong>89</strong> guacamayas de hermosos colores. Por el ruido del tráfico, volaron asustadas <strong>35</strong> guacamayas. ¿Cuántas guacamayas quedaron en el parque?',
+                    num1: 89,
+                    num2: 35,
+                    operator: '-',
+                    correctAnswer: 54,
+                    userAnswer: '',
+                    status: 'pending',
+                    clue: 'Como se fueron guacamayas, ¡tienes que quitar! Es una resta.'
+                },
+                {
+                    id: 'challenge-3',
+                    title: '🎮 Los Juguetes en el Almacén',
+                    text: 'Una juguetería muy famosa en Bogotá tiene un estante con <strong>456</strong> carritos de juguete coleccionables. El fin de semana, los niños felices compraron <strong>123</strong> de ellos. ¿Cuántos carritos le quedaron al almacén?',
+                    num1: 456,
+                    num2: 123,
+                    operator: '-',
+                    correctAnswer: 333,
+                    userAnswer: '',
+                    status: 'pending',
+                    clue: 'Si se vendieron carritos, quedan menos. ¡Usa una resta!'
+                },
+                {
+                    id: 'challenge-4',
+                    title: '🌱 Semillas de la Huerta Escolar',
+                    text: 'En la escuela primaria, los niños de segundo grado sembraron <strong>120</strong> semillas de frijol y <strong>185</strong> semillas de maíz para crear una huerta. ¿Cuántas semillas sembraron en total los niños?',
+                    num1: 120,
+                    num2: 185,
+                    operator: '+',
+                    correctAnswer: 305,
+                    userAnswer: '',
+                    status: 'pending',
+                    clue: 'Queremos juntar todas las semillas sembradas. ¡Hagamos una suma!'
+                },
+                {
+                    id: 'challenge-5',
+                    title: '🎈 El Cumpleaños Sorpresa',
+                    text: 'Para la fiesta sorpresa de Juliana en Cali, inflaron <strong>250</strong> globos amarillos y <strong>138</strong> globos rosados. ¿Cuántos globos decoran el salón de fiesta en total?',
+                    num1: 250,
+                    num2: 138,
+                    operator: '+',
+                    correctAnswer: 388,
+                    userAnswer: '',
+                    status: 'pending',
+                    clue: '¡Junta todos los globos hermosos para saber el total! Suma.'
+                }
+            ];
+        }
+
+        function renderPractice(filter = 'all') {
+            const container = document.getElementById('operations-container');
+            container.innerHTML = '';
+
+            practiceList.forEach((item, index) => {
+                // Aplicar filtros
+                if (filter !== 'all' && item.type !== filter) {
+                    return;
+                }
+
+                // Generar los divs para la visualización del cuaderno escolar de matemáticas
+                const opCard = document.createElement('div');
+                opCard.className = `p-4 rounded-2xl bg-white border-2 shadow-sm flex flex-col items-center transition-all duration-300 relative ${
+                    item.status === 'correct' ? 'border-emerald-500 bg-emerald-50/50' : 
+                    item.status === 'incorrect' ? 'border-red-400 bg-red-50/50' : 'border-slate-100 hover:border-emerald-200'
+                }`;
+
+                // Representar los dígitos en forma vertical alineada
+                const n1Str = item.num1.toString().padStart(3, ' ');
+                const n2Str = item.num2.toString().padStart(3, ' ');
+                
+                // Formateo de los dígitos individuales para que queden alineados exactamente
+                const d1_1 = n1Str[0] === ' ' ? '&nbsp;' : n1Str[0];
+                const d1_2 = n1Str[1] === ' ' ? '&nbsp;' : n1Str[1];
+                const d1_3 = n1Str[2];
+
+                const d2_1 = n2Str[0] === ' ' ? '&nbsp;' : n2Str[0];
+                const d2_2 = n2Str[1] === ' ' ? '&nbsp;' : n2Str[1];
+                const d2_3 = n2Str[2];
+
+                opCard.innerHTML = `
+                    <span class="absolute top-2 left-3 text-xs font-bold text-slate-400">#${index + 1}</span>
+                    <div class="font-mono text-xl tracking-widest text-slate-800 my-2 select-none">
+                        <div class="flex justify-end pr-1 text-[10px] text-slate-400 font-sans tracking-normal pb-0.5 border-b border-slate-100">
+                            C&nbsp;D&nbsp;U
+                        </div>
+                        <div class="flex justify-end gap-1 font-bold">
+                            <span>${d1_1}</span><span>${d1_2}</span><span>${d1_3}</span>
+                        </div>
+                        <div class="flex justify-between items-center gap-1 border-b-2 border-slate-800 pb-1 font-bold">
+                            <span class="text-orange-500 font-sans text-lg">${item.operator}</span>
+                            <div class="flex gap-1">
+                                <span>${d2_1}</span><span>${d2_2}</span><span>${d2_3}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Entrada de respuesta -->
+                    <input type="number" id="input-practice-${item.id}" value="${item.userAnswer}" 
+                           placeholder="?"
+                           class="w-full text-center py-2 px-1 border-2 border-slate-200 rounded-xl font-bold font-mono text-lg focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all ${
+                               verifiedPractice ? 'pointer-events-none' : ''
+                           }"
+                           oninput="savePracticeAnswer('${item.id}', this.value)">
+                    
+                    <!-- Retroalimentación visual individual -->
+                    <div class="mt-2 text-center h-5">
+                        ${item.status === 'correct' ? '<span class="text-emerald-600 font-extrabold text-sm flex items-center gap-1">✅ ¡Bien!</span>' : ''}
+                        ${item.status === 'incorrect' ? `<span class="text-red-500 font-bold text-xs">❌ Era ${item.correctAnswer}</span>` : ''}
+                    </div>
+                `;
+                container.appendChild(opCard);
+            });
+        }
+
+        function savePracticeAnswer(id, val) {
+            const index = practiceList.findIndex(x => x.id === id);
+            if (index !== -1) {
+                practiceList[index].userAnswer = val;
+                updateLiveStats();
+            }
+        }
+
+        function filterPractice(type) {
+            // Remover estilos activos de todos los botones de filtrado
+            document.querySelectorAll("[id^='btn-filter-']").forEach(btn => {
+                btn.className = "px-4 py-2 text-xs font-bold rounded-lg transition-all text-emerald-700 hover:bg-white/50";
+            });
+            // Activar botón seleccionado
+            document.getElementById(`btn-filter-${type}`).className = "px-4 py-2 text-xs font-bold rounded-lg transition-all bg-emerald-500 text-white shadow-sm";
+            renderPractice(type);
+        }
+
+        function renderChallenges() {
+            const container = document.getElementById('challenges-container');
+            container.innerHTML = '';
+
+            challengesList.forEach((chal) => {
+                const card = document.createElement('div');
+                card.className = `p-5 md:p-6 rounded-2xl bg-white border-2 shadow-sm transition-all duration-300 ${
+                    chal.status === 'correct' ? 'border-cyan-500 bg-cyan-50/50' :
+                    chal.status === 'incorrect' ? 'border-rose-400 bg-rose-50/50' : 'border-slate-100 hover:border-cyan-200'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-3 mb-4">
+                        <h4 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            ${chal.title}
+                        </h4>
+                        <span class="text-xs bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full font-bold">Reto Activo</span>
+                    </div>
+
+                    <p class="text-sm md:text-base leading-relaxed text-slate-600 mb-4">${chal.text}</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-50 p-4 rounded-xl">
+                        <div class="flex items-center gap-2 text-xs text-amber-600 font-semibold bg-amber-50 p-2 rounded-lg border border-amber-100">
+                            <span>💡 Pista:</span>
+                            <span>${chal.clue}</span>
+                        </div>
+
+                        <!-- Sección de Respuesta -->
+                        <div class="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0 justify-end">
+                            <label for="input-chal-${chal.id}" class="text-sm font-bold text-slate-600 whitespace-nowrap">Respuesta:</label>
+                            <input type="number" id="input-chal-${chal.id}" value="${chal.userAnswer}" 
+                                   placeholder="Respuesta aquí"
+                                   class="w-32 text-center py-2 px-3 border-2 border-slate-200 rounded-xl font-bold font-mono text-base focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition-all ${
+                                       verifiedChallenges ? 'pointer-events-none' : ''
+                                   }"
+                                   oninput="saveChallengeAnswer('${chal.id}', this.value)">
+                        </div>
+                    </div>
+
+                    <!-- Retroalimentación del Reto -->
+                    <div class="mt-2 text-right h-5">
+                        ${chal.status === 'correct' ? '<span class="text-emerald-600 font-extrabold text-sm flex items-center justify-end gap-1">🌟 ¡Excelente Respuesta! Correcto.</span>' : ''}
+                        ${chal.status === 'incorrect' ? `<span class="text-rose-500 font-bold text-xs">❌ Inténtalo de nuevo. La respuesta correcta era ${chal.correctAnswer}.</span>` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function saveChallengeAnswer(id, val) {
+            const index = challengesList.findIndex(x => x.id === id);
+            if (index !== -1) {
+                challengesList[index].userAnswer = val;
+            }
+        }
+
+        function switchTab(tabId) {
+            // Ocultar todas las secciones
+            document.getElementById('section-tutorial').classList.add('hidden');
+            document.getElementById('section-practice').classList.add('hidden');
+            document.getElementById('section-challenges').classList.add('hidden');
+            document.getElementById('section-results').classList.add('hidden');
+
+            // Resetear estilos de todos los botones
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.className = "flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition-all duration-300 text-emerald-600 hover:bg-emerald-50";
+            });
+
+            // Activar pestaña y sección requerida
+            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+            document.getElementById(`btn-${tabId}`).className = "flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition-all duration-300 bg-emerald-500 text-white shadow-md";
+
+            // Si entra a pestaña de logros, calcular progreso
+            if (tabId === 'results') {
+                calculateFinalLog();
+            }
+        }
+
+        function updateLiveStats() {
+            let total = practiceList.length;
+            let answered = practiceList.filter(x => x.userAnswer !== '').length;
+            let correct = practiceList.filter(x => x.status === 'correct').length;
+            let progressPct = Math.round((answered / total) * 100);
+
+            document.getElementById('live-resolved').innerText = `${answered} / ${total}`;
+            document.getElementById('live-success').innerText = correct;
+            document.getElementById('live-progress-pct').innerText = `${progressPct}%`;
+
+            // Escala de calificación en vivo colombiana
+            let rating = "---";
+            if (answered > 0) {
+                let successRate = correct / answered;
+                if (successRate >= 0.9) rating = "Superior ⭐";
+                else if (successRate >= 0.8) rating = "Alto 🏆";
+                else if (successRate >= 0.6) rating = "Básico 👍";
+                else rating = "Pendiente / Bajo 💪";
+            }
+            document.getElementById('live-rating').innerText = rating;
+        }
+
+        function verifyPractice() {
+            let correctCount = 0;
+            let answeredCount = 0;
+
+            practiceList.forEach(item => {
+                if (item.userAnswer !== '') {
+                    answeredCount++;
+                    if (parseInt(item.userAnswer) === item.correctAnswer) {
+                        item.status = 'correct';
+                        correctCount++;
+                        // Añadir animación divertida temporal al input correspondiente
+                        const inp = document.getElementById(`input-practice-${item.id}`);
+                        if (inp) {
+                            inp.classList.add('correct-answer-anim');
+                        }
+                    } else {
+                        item.status = 'incorrect';
+                    }
+                } else {
+                    item.status = 'pending';
+                }
+            });
+
+            verifiedPractice = true;
+            renderPractice();
+            updateLiveStats();
+
+            // Mensaje flotante lúdico
+            if (answeredCount < 40) {
+                showFloatingNotification(`¡Has verificado tus respuestas! Recuerda completar los ejercicios vacíos para ganar tu certificado. ⭐`);
+            } else {
+                showFloatingNotification(`¡Impresionante! Has terminado todas las prácticas. Revisa tu sección de Logros ahora mismo. 🏆`);
+            }
+        }
+
+        function regeneratePractice() {
+            verifiedPractice = false;
+            generatePracticeData();
+            renderPractice();
+            updateLiveStats();
+            showFloatingNotification("¡Se han generado nuevas sumas y restas para que sigas aprendiendo! 🔄");
+        }
+
+        function verifyChallenges() {
+            let correctCount = 0;
+            challengesList.forEach(chal => {
+                if (chal.userAnswer !== '') {
+                    if (parseInt(chal.userAnswer) === chal.correctAnswer) {
+                        chal.status = 'correct';
+                        correctCount++;
+                    } else {
+                        chal.status = 'incorrect';
+                    }
+                }
+            });
+
+            verifiedChallenges = true;
+            renderChallenges();
+
+            if (correctCount === 5) {
+                showFloatingNotification("¡Estupendo! Eres todo un Sherlock Holmes de las matemáticas. Resolviste todos los problemas. 🧠🕵️");
+            } else {
+                showFloatingNotification(`¡Buen esfuerzo! Completaste tu verificación de retos diarios.`);
+            }
+        }
+
+        function resetChallenges() {
+            verifiedChallenges = false;
+            generateChallengesData();
+            renderChallenges();
+            showFloatingNotification("Has restablecido tus retos. ¡Esta vez lo lograrás! 🎯");
+        }
+
+        function showFloatingNotification(text) {
+            // Elimina una anterior si existe
+            const prev = document.getElementById('custom-toast');
+            if (prev) prev.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'custom-toast';
+            toast.className = 'fixed bottom-5 right-5 bg-slate-900 text-white font-bold py-3 px-5 rounded-2xl shadow-xl z-50 text-sm max-w-sm flex items-center gap-2 transition-all duration-300 transform translate-y-10 opacity-0';
+            toast.innerHTML = `<span>💡</span> <span>${text}</span>`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function calculateFinalLog() {
+            let totalPractice = practiceList.length;
+            let correctPractice = practiceList.filter(x => x.status === 'correct').length;
+            
+            let totalChallenges = challengesList.length;
+            let correctChallenges = challengesList.filter(x => x.status === 'correct').length;
+
+            let totalSolved = correctPractice + correctChallenges;
+            let totalPossible = totalPractice + totalChallenges; // 45 en total
+
+            let pct = Math.round((totalSolved / totalPossible) * 100);
+
+            // Actualizar Anillo de Progreso en la sección final
+            const ring = document.getElementById('results-ring');
+            const pctText = document.getElementById('results-pct');
+            
+            // Fórmula del radio de stroke-dashoffset: 2 * PI * r = 2 * 3.1415 * 70 = 439.8
+            const dashOffset = 439.8 - (439.8 * pct) / 100;
+            ring.style.strokeDashoffset = dashOffset;
+            pctText.innerText = `${pct}%`;
+
+            // Saludo personalizado con el nombre del niño
+            const sNameInput = document.getElementById('studentName').value.trim();
+            const studentNameStr = sNameInput !== "" ? sNameInput : "Súper Aventurero";
+            document.getElementById('results-greeting').innerText = `¡Hola, ${studentNameStr}!`;
+
+            const summaryText = `Has resuelto de forma correcta ${correctPractice} de ${totalPractice} prácticas operativas y superado ${correctChallenges} de ${totalChallenges} desafíos de razonamiento de segundo grado.`;
+            document.getElementById('results-summary').innerText = summaryText;
+
+            // Mensajes motivacionales y liberación del Diploma
+            const msgBox = document.getElementById('results-message');
+            msgBox.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-amber-100', 'text-amber-800', 'bg-red-100', 'text-red-800');
+
+            if (pct >= 80) {
+                msgBox.classList.add('bg-emerald-100', 'text-emerald-800');
+                msgBox.innerHTML = `🏆 <strong>¡Fabuloso logro!</strong> Eres un experto certificado de las matemáticas de 2° grado. Tu certificado de Supercampeón se ha desbloqueado a continuación. ¡Puedes imprimirlo o guardarlo para presumir con tu familia! 🎉`;
+                
+                // Mostrar Diploma y rellenar datos
+                document.getElementById('diploma-wrapper').classList.remove('hidden');
+                document.getElementById('diploma-student-name').innerText = studentNameStr;
+                
+                // Lanzar confeti para celebrar
+                triggerConfetti();
+            } else if (pct >= 50) {
+                msgBox.classList.add('bg-amber-100', 'text-amber-800');
+                msgBox.innerHTML = `⭐ <strong>¡Vas por muy buen camino!</strong> Lograste un puntaje de ${pct}%. Te falta muy poco para llegar al nivel de Supercampeón (80%). ¡Intenta resolver más preguntas para desbloquear tu Diploma Oficial! 🎈`;
+                document.getElementById('diploma-wrapper').classList.add('hidden');
+            } else {
+                msgBox.classList.add('bg-red-100', 'text-red-800');
+                msgBox.innerHTML = `💪 <strong>¡No te rindas, aventurero!</strong> La matemática es una ciencia mágica que requiere entrenamiento. Practica un poco más, repasa la pestaña de "Aprendo Primero" y vuelve a intentarlo. ¡Tú puedes lograrlo! 🚀`;
+                document.getElementById('diploma-wrapper').classList.add('hidden');
+            }
+        }
+
+        function updateStudentNameInDiploma() {
+            const sNameInput = document.getElementById('studentName').value.trim();
+            const studentNameStr = sNameInput !== "" ? sNameInput : "Súper Aventurero";
+            
+            // Actualizar diploma si ya está visible
+            const diplomaName = document.getElementById('diploma-student-name');
+            if (diplomaName) {
+                diplomaName.innerText = studentNameStr;
+            }
+        }
+
+        function triggerConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = ''; // Limpiar confeti previo
+
+            const colors = ['#f39c12', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#1abc9c', '#f1c40f'];
+
+            for (let i = 0; i < 70; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = `${Math.random() * 100}%`;
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animationDelay = `${Math.random() * 2}s`;
+                conf.style.transform = `scale(${Math.random() * 1.2 + 0.4})`;
+                container.appendChild(conf);
+            }
+        }
+
+        function printDiploma() {
+            const sNameInput = document.getElementById('studentName').value.trim();
+            const studentNameStr = sNameInput !== "" ? sNameInput : "Súper Aventurero";
+
+            // Se utiliza la función de impresión nativa del sistema, ocultando temporalmente el resto del dom mediante CSS de medios de impresión
+            const printStyle = document.createElement('style');
+            printStyle.innerHTML = `
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    #diploma-element, #diploma-element * {
+                        visibility: visible;
+                    }
+                    #diploma-element {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        border: 8px solid #f59e0b !important;
+                        padding: 30px !important;
+                    }
+                }
+            `;
+            document.head.appendChild(printStyle);
+            window.print();
+            // Limpieza del estilo para que no afecte la web después de la acción de impresión
+            printStyle.remove();
+        }
+    </script>
+</body>
+</html>
