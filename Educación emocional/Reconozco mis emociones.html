@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Camino de las Emociones - Juego Infantil</title>
+    <!-- Tailwind CSS para el diseño responsivo y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka para un estilo redondeado e infantil -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome para iconos bonitos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Fredoka', 'sans-serif'],
+                    },
+                    colors: {
+                        kidYellow: '#FFE17D',
+                        kidOrange: '#FF9E64',
+                        kidPink: '#FF8EB1',
+                        kidPurple: '#B197FC',
+                        kidBlue: '#74C0FC',
+                        kidGreen: '#63E6BE',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #FFF9E6 0%, #E8F5E9 100%);
+            overflow-x: hidden;
+        }
+
+        /* Animación para nubes flotantes */
+        .floating-cloud {
+            animation: float 12s ease-in-out infinite alternate;
+        }
+        .floating-cloud-delayed {
+            animation: float-delayed 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -15px) scale(1.05); }
+        }
+
+        @keyframes float-delayed {
+            0% { transform: translate(0, 0) scale(1.05); }
+            100% { transform: translate(-35px, 20px) scale(0.95); }
+        }
+
+        /* Animación suave para botones */
+        .btn-bounce {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-bounce:hover {
+            transform: scale(1.08) translateY(-5px);
+        }
+        .btn-bounce:active {
+            transform: scale(0.95);
+        }
+
+        /* Sombra tierna */
+        .soft-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .border-kid {
+            border-width: 6px;
+        }
+
+        /* Estilo personalizado del scroll */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFF9E6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FF9E64;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-3 md:p-6 relative">
+
+    <!-- Decoraciones de fondo mágicas -->
+    <div class="absolute top-10 left-10 text-6xl opacity-30 floating-cloud select-none pointer-events-none">☁️</div>
+    <div class="absolute top-1/4 right-12 text-7xl opacity-20 floating-cloud-delayed select-none pointer-events-none">☁️</div>
+    <div class="absolute bottom-20 left-8 text-6xl opacity-25 floating-cloud-delayed select-none pointer-events-none">✨</div>
+    <div class="absolute bottom-1/3 right-16 text-5xl opacity-30 floating-cloud select-none pointer-events-none">🌈</div>
+
+    <!-- Contenedor del juego principal -->
+    <main class="w-full max-w-2xl bg-white rounded-3xl border-kid border-yellow-200 soft-shadow p-6 md:p-8 relative z-10 my-auto">
+        
+        <!-- PANTALLA 1: BIENVENIDA -->
+        <div id="screen-welcome" class="text-center">
+            <div class="inline-block bg-kidYellow p-3 rounded-full mb-3 animate-bounce">
+                <span class="text-5xl md:text-6xl">🌟</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-bold text-yellow-600 mb-2">¡Hola, Pequeño Explorador!</h1>
+            <p class="text-lg md:text-xl text-gray-600 mb-6 font-semibold">Vamos a jugar y aprender sobre nuestras emociones. ¡Es súper divertido!</p>
+            
+            <!-- Selector de Avatar -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-gray-700 mb-4">✨ Elige tu amiguito de viaje:</h3>
+                <div class="grid grid-cols-4 gap-3 max-w-md mx-auto">
+                    <button onclick="selectAvatar('dog', '🐶')" id="avatar-dog" class="avatar-option p-4 bg-yellow-50 rounded-2xl border-4 border-yellow-200 hover:border-yellow-400 transition-all text-center">
+                        <span class="text-4xl block">🐶</span>
+                        <span class="text-xs font-bold text-gray-500 mt-1 block">Perrito</span>
+                    </button>
+                    <button onclick="selectAvatar('cat', '🐱')" id="avatar-cat" class="avatar-option p-4 bg-pink-50 rounded-2xl border-4 border-pink-200 hover:border-pink-400 transition-all text-center">
+                        <span class="text-4xl block">🐱</span>
+                        <span class="text-xs font-bold text-gray-500 mt-1 block">Gatito</span>
+                    </button>
+                    <button onclick="selectAvatar('bear', '🐻')" id="avatar-bear" class="avatar-option p-4 bg-orange-50 rounded-2xl border-4 border-orange-200 hover:border-orange-400 transition-all text-center">
+                        <span class="text-4xl block">🐻</span>
+                        <span class="text-xs font-bold text-gray-500 mt-1 block">Osito</span>
+                    </button>
+                    <button onclick="selectAvatar('rabbit', '🐰')" id="avatar-rabbit" class="avatar-option p-4 bg-blue-50 rounded-2xl border-4 border-blue-200 hover:border-blue-400 transition-all text-center">
+                        <span class="text-4xl block">🐰</span>
+                        <span class="text-xs font-bold text-gray-500 mt-1 block">Conejo</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botón de Inicio -->
+            <button onclick="startGame()" class="btn-bounce bg-kidOrange hover:bg-orange-500 text-white font-bold text-2xl py-4 px-10 rounded-full shadow-lg border-b-8 border-orange-700 transition-all inline-flex items-center gap-3">
+                <span>¡Empezar a Jugar!</span>
+                <i class="fa-solid fa-play"></i>
+            </button>
+        </div>
+
+        <!-- PANTALLA 2: JUEGO ACTIVO (PREGUNTAS) -->
+        <div id="screen-game" class="hidden">
+            <!-- Cabecera del juego -->
+            <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-gray-100">
+                <!-- Información del jugador -->
+                <div class="flex items-center gap-3">
+                    <span id="player-avatar-display" class="text-4xl p-2 bg-yellow-100 rounded-full">🐶</span>
+                    <div>
+                        <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Viajero Emocional</p>
+                        <p class="text-md font-bold text-gray-700">¡Haciéndolo genial!</p>
+                    </div>
+                </div>
+                
+                <!-- Barra de progreso e indicador de pasos -->
+                <div class="text-right">
+                    <span class="text-lg font-bold text-kidPurple" id="question-counter">Pregunta 1 de 4</span>
+                    <div class="w-28 bg-gray-200 h-3 rounded-full mt-1 overflow-hidden">
+                        <div id="progress-bar" class="bg-kidPurple h-full transition-all duration-500" style="width: 25%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta de la situación cotidiana -->
+            <div class="bg-blue-50 rounded-3xl p-6 mb-6 border-4 border-blue-100 relative overflow-hidden text-center">
+                <!-- Botón de Altavoz (Texto a voz para accesibilidad infantil) -->
+                <button onclick="readQuestionAloud()" class="absolute top-3 right-3 bg-white hover:bg-blue-100 text-blue-500 hover:text-blue-600 font-bold p-3 rounded-full transition-all soft-shadow" title="Escuchar pregunta">
+                    <i class="fa-solid fa-volume-high text-xl"></i>
+                </button>
+                
+                <!-- Ilustración representativa de situación -->
+                <div id="situation-emoji" class="text-7xl mb-4 animate-bounce">🎂</div>
+                <!-- Texto descriptivo simple -->
+                <h2 id="situation-text" class="text-xl md:text-2xl font-bold text-blue-900 leading-snug px-4">¡Hoy es tu cumpleaños y todos tus amigos te traen un pastel delicioso!</h2>
+                <p class="text-sm md:text-base text-blue-600 font-semibold mt-2">¿Cómo crees que te sientes en este momento?</p>
+            </div>
+
+            <!-- Opciones de respuesta interactiva -->
+            <div class="grid grid-cols-2 gap-4" id="options-container">
+                <!-- Se generará dinámicamente con JS -->
+            </div>
+
+            <!-- Panel de retroalimentación inmediata (animada) -->
+            <div id="feedback-panel" class="hidden mt-6 p-4 rounded-2xl text-center font-bold text-lg animate-fade-in-down transition-all">
+                <span id="feedback-emoji" class="text-3xl mr-2">🌟</span>
+                <span id="feedback-text">¡Eso es correcto!</span>
+            </div>
+        </div>
+
+        <!-- PANTALLA 3: RESULTADOS Y MENSAJE MOTIVADOR -->
+        <div id="screen-results" class="hidden text-center relative">
+            <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none w-full h-full rounded-2xl"></canvas>
+            
+            <div class="relative z-10">
+                <div class="inline-block bg-green-100 p-4 rounded-full mb-4">
+                    <span id="result-badge-emoji" class="text-6xl md:text-7xl">🏆</span>
+                </div>
+                
+                <h2 class="text-3xl md:text-4xl font-bold text-green-600 mb-2">¡Completaste el Camino!</h2>
+                
+                <!-- Puntuación llamativa -->
+                <div class="my-6">
+                    <p class="text-gray-500 font-bold text-lg">Tu súper puntuación es:</p>
+                    <div class="inline-flex items-center justify-center bg-yellow-100 border-4 border-yellow-300 rounded-full px-8 py-3 mt-1">
+                        <span class="text-3xl md:text-5xl font-black text-yellow-600" id="final-score-text">4 / 4</span>
+                        <span class="text-2xl ml-2">⭐</span>
+                    </div>
+                </div>
+
+                <!-- Mensaje motivador según desempeño -->
+                <div class="bg-gray-50 rounded-2xl p-5 mb-8 border-2 border-dashed border-gray-200">
+                    <p id="motivational-message" class="text-lg md:text-xl font-semibold text-gray-700 leading-relaxed">
+                        ¡Eres increíble reconociendo emociones! Recuerda que todas las emociones son buenas e importantes. 😊
+                    </p>
+                </div>
+
+                <!-- Botón Intentar de nuevo / Jugar otra vez -->
+                <button onclick="restartGame()" class="btn-bounce bg-kidPurple hover:bg-purple-600 text-white font-bold text-xl py-4 px-10 rounded-full shadow-lg border-b-8 border-purple-800 transition-all inline-flex items-center gap-3">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>¡Intentar de nuevo!</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- WIDGET EXTRA: EXPLORADOR DE EMOCIONES EN EL PIE DE PÁGINA -->
+    <div class="w-full max-w-2xl bg-white rounded-2xl border-4 border-purple-100 soft-shadow p-5 mt-6 mb-2 relative z-10">
+        <h3 class="text-md md:text-lg font-bold text-purple-700 mb-3 text-center">
+            <i class="fa-solid fa-magnifying-glass-chart mr-1"></i> ¡Toca cada emoción para conocerla mejor!
+        </h3>
+        
+        <div class="grid grid-cols-4 gap-2">
+            <!-- Alegría -->
+            <button onclick="showEmotionInfo('joy')" class="btn-bounce bg-yellow-50 hover:bg-yellow-100 border-2 border-yellow-200 p-2 rounded-xl text-center flex flex-col items-center">
+                <span class="text-3xl">😊</span>
+                <span class="text-xs font-extrabold text-yellow-700 mt-1">Alegría</span>
+            </button>
+            <!-- Tristeza -->
+            <button onclick="showEmotionInfo('sadness')" class="btn-bounce bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 p-2 rounded-xl text-center flex flex-col items-center">
+                <span class="text-3xl">😢</span>
+                <span class="text-xs font-extrabold text-blue-700 mt-1">Tristeza</span>
+            </button>
+            <!-- Enojo -->
+            <button onclick="showEmotionInfo('anger')" class="btn-bounce bg-red-50 hover:bg-red-100 border-2 border-red-200 p-2 rounded-xl text-center flex flex-col items-center">
+                <span class="text-3xl">😡</span>
+                <span class="text-xs font-extrabold text-red-700 mt-1">Enojo</span>
+            </button>
+            <!-- Miedo -->
+            <button onclick="showEmotionInfo('fear')" class="btn-bounce bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 p-2 rounded-xl text-center flex flex-col items-center">
+                <span class="text-3xl">😨</span>
+                <span class="text-xs font-extrabold text-purple-700 mt-1">Miedo</span>
+            </button>
+        </div>
+
+        <!-- Panel de información de emociones dinámico -->
+        <div id="emotion-info-panel" class="hidden mt-4 bg-purple-50 rounded-xl p-4 text-center border border-purple-100 transition-all duration-300">
+            <h4 id="info-title" class="font-bold text-lg text-purple-800">Emoción</h4>
+            <p id="info-desc" class="text-sm text-purple-900 mt-1">Detalles sobre la emoción seleccionada.</p>
+            <p id="info-tip" class="text-xs text-purple-600 font-semibold italic mt-2">Un súper consejo.</p>
+        </div>
+    </div>
+
+    <!-- Pie de página suave -->
+    <footer class="text-center text-xs text-gray-500 font-semibold py-4 select-none pointer-events-none">
+        Diseñado con cariño para la educación emocional de los más pequeños • 2026 🎈
+    </footer>
+
+    <!-- JAVASCRIPT DE CONTROL DEL JUEGO -->
+    <script>
+        // CONFIGURACIONES Y AUDIO INTEGRADO (Sintetizador Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playBeep(type) {
+            // Reanudar contexto de audio si estaba suspendido (política del navegador)
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                // Sonido alegre ascendente (Doble bip tierno)
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                // Sonido amigable que invita a intentarlo de nuevo (suave deslizamiento hacia abajo)
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(349.23, now); // F4
+                osc.frequency.exponentialRampToValueAtTime(261.63, now + 0.25); // C4
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'complete') {
+                // Fanfarria feliz para la victoria
+                osc.type = 'sine';
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const oscNote = audioCtx.createOscillator();
+                    const gainNote = audioCtx.createGain();
+                    oscNote.connect(gainNote);
+                    gainNote.connect(audioCtx.destination);
+                    oscNote.type = 'sine';
+                    oscNote.frequency.setValueAtTime(freq, now + (idx * 0.12));
+                    gainNote.gain.setValueAtTime(0.12, now + (idx * 0.12));
+                    gainNote.gain.exponentialRampToValueAtTime(0.01, now + (idx * 0.12) + 0.3);
+                    oscNote.start(now + (idx * 0.12));
+                    oscNote.stop(now + (idx * 0.12) + 0.3);
+                });
+            } else if (type === 'click') {
+                // Un sutil y dulce sonido al seleccionar
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now); // A4
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            }
+        }
+
+        // BASE DE DATOS DEL JUEGO (Situaciones y Preguntas)
+        const gameQuestions = [
+            {
+                id: 1,
+                emotion: "joy",
+                emoji: "🎂",
+                situation: "¡Hoy es tu cumpleaños y todos tus amigos te traen un pastel delicioso!",
+                options: [
+                    { text: "Alegre / Feliz", emoji: "😊", isCorrect: true, feedback: "¡Súper bien! Compartir tu cumpleaños con amigos nos llena de alegría y felicidad." },
+                    { text: "Triste", emoji: "😢", isCorrect: false, feedback: "Mmm, ¿seguro? Un pastel y tus amigos cantando generalmente nos hace sonreír." },
+                    { text: "Enojado", emoji: "😡", isCorrect: false, feedback: "¡Cerca, pero no! Los regalos y las sonrisas no suelen darnos rabia." },
+                    { text: "Asustado", emoji: "😨", isCorrect: false, feedback: "¡Vaya! No hay por qué tener miedo, tus amigos te quieren mucho." }
+                ]
+            },
+            {
+                id: 2,
+                emotion: "sadness",
+                emoji: "🧸",
+                situation: "Estás jugando con tu juguete favorito y de repente... ¡Se rompe una pieza!",
+                options: [
+                    { text: "Alegre / Feliz", emoji: "😊", isCorrect: false, feedback: "Oh, cuando algo que amamos se daña, es normal no sentir felicidad." },
+                    { text: "Triste", emoji: "😢", isCorrect: true, feedback: "¡Exactamente! Es muy normal sentir tristeza cuando se rompe algo que nos gusta mucho." },
+                    { text: "Enojado", emoji: "😡", isCorrect: false, feedback: "¡A veces da coraje! Pero la sensación de vacío por tu juguete roto es principalmente de tristeza." },
+                    { text: "Asustado", emoji: "😨", isCorrect: false, feedback: "¡Uh! Puede asustarte un poco el ruido, pero la rotura de tu juguete nos pone cabizbajos." }
+                ]
+            },
+            {
+                id: 3,
+                emotion: "anger",
+                emoji: "🏰",
+                situation: "Hiciste una torre de bloques muy gigante y alguien pasa corriendo y la tira al suelo.",
+                options: [
+                    { text: "Alegre / Feliz", emoji: "😊", isCorrect: false, feedback: "¡Caray! Ver caer tu gran esfuerzo no suele causar risas." },
+                    { text: "Triste", emoji: "😢", isCorrect: false, feedback: "¡Puede darnos ganas de llorar! Pero antes solemos sentir otra gran emoción roja en el pecho." },
+                    { text: "Enojado", emoji: "😡", isCorrect: true, feedback: "¡Sí, totalmente! Es muy normal enfadarse cuando alguien arruina nuestro trabajo sin querer o a propósito." },
+                    { text: "Asustado", emoji: "😨", isCorrect: false, feedback: "¡No es muy asustoso! Es más bien una situación que nos hace fruncir el ceño." }
+                ]
+            },
+            {
+                id: 4,
+                emotion: "fear",
+                emoji: "⛈️",
+                situation: "Te vas a dormir, se apagan las luces y de pronto se escucha un trueno muy fuerte afuera de la ventana.",
+                options: [
+                    { text: "Alegre / Feliz", emoji: "😊", isCorrect: false, feedback: "¡Uf! Un estruendo oscuro en medio de la noche no suele ponernos felices." },
+                    { text: "Triste", emoji: "😢", isCorrect: false, feedback: "No nos pone melancólicos, es una sensación de querer esconderse bajo las cobijas." },
+                    { text: "Enojado", emoji: "😡", isCorrect: false, feedback: "¡No solemos retar a los truenos! Hay otra sensación que nos hace temblar." },
+                    { text: "Asustado", emoji: "😨", isCorrect: true, feedback: "¡Muy bien descubierto! Los ruidos fuertes e inesperados en la oscuridad nos despiertan el miedo." }
+                ]
+            }
+        ];
+
+        // ESTADO GLOBAL DEL JUEGO
+        let currentQuestionIdx = 0;
+        let score = 0;
+        let selectedAvatarId = 'dog';
+        let selectedAvatarEmoji = '🐶';
+        let hasAnsweredCurrent = false;
+
+        // SELECCIÓN DE AVATAR
+        function selectAvatar(id, emoji) {
+            playBeep('click');
+            selectedAvatarId = id;
+            selectedAvatarEmoji = emoji;
+            
+            // Actualizar visualmente la opción seleccionada
+            document.querySelectorAll('.avatar-option').forEach(el => {
+                el.classList.remove('border-yellow-400', 'border-pink-400', 'border-orange-400', 'border-blue-400', 'bg-white', 'scale-105');
+                el.classList.add('opacity-70');
+            });
+            
+            const selectedBtn = document.getElementById(`avatar-${id}`);
+            selectedBtn.classList.add('bg-white', 'scale-105', 'soft-shadow');
+            selectedBtn.classList.remove('opacity-70');
+            
+            if (id === 'dog') selectedBtn.classList.add('border-yellow-400');
+            if (id === 'cat') selectedBtn.classList.add('border-pink-400');
+            if (id === 'bear') selectedBtn.classList.add('border-orange-400');
+            if (id === 'rabbit') selectedBtn.classList.add('border-blue-400');
+        }
+
+        // INICIAR JUEGO
+        function startGame() {
+            playBeep('click');
+            // Ocultar pantalla de bienvenida
+            document.getElementById('screen-welcome').classList.add('hidden');
+            // Mostrar pantalla de juego
+            document.getElementById('screen-game').classList.remove('hidden');
+            
+            // Configurar avatar elegido en el encabezado
+            document.getElementById('player-avatar-display').innerText = selectedAvatarEmoji;
+            
+            // Cargar la primera pregunta
+            currentQuestionIdx = 0;
+            score = 0;
+            loadQuestion();
+        }
+
+        // LEER PREGUNTA EN VOZ ALTA (Para niños pequeños que no saben leer fluido)
+        function readQuestionAloud() {
+            if ('speechSynthesis' in window) {
+                // Cancelar cualquier discurso en curso primero
+                window.speechSynthesis.cancel();
+                
+                const questionData = gameQuestions[currentQuestionIdx];
+                const textToSpeak = `${questionData.situation}. ¿Cómo crees que te sientes en este momento?`;
+                
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'es-MX'; // Español latino preferido
+                utterance.pitch = 1.2; // Tono ligeramente más agudo para que sea amigable e infantil
+                utterance.rate = 0.9;  // Velocidad pausada
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                // Si el navegador no lo soporta de forma nativa, avisar silenciosamente
+                console.log("Speech synthesis no soportado en este navegador.");
+            }
+        }
+
+        // CARGAR PREGUNTA EN PANTALLA
+        function loadQuestion() {
+            hasAnsweredCurrent = false;
+            const questionData = gameQuestions[currentQuestionIdx];
+            
+            // Ocultar panel de retroalimentación
+            const feedbackPanel = document.getElementById('feedback-panel');
+            feedbackPanel.classList.add('hidden');
+            feedbackPanel.className = "mt-6 p-4 rounded-2xl text-center font-bold text-lg animate-fade-in-down transition-all";
+            
+            // Actualizar textos e ilustraciones
+            document.getElementById('question-counter').innerText = `Pregunta ${currentQuestionIdx + 1} de 4`;
+            document.getElementById('progress-bar').style.width = `${((currentQuestionIdx + 1) / 4) * 100}%`;
+            document.getElementById('situation-emoji').innerText = questionData.emoji;
+            document.getElementById('situation-text').innerText = questionData.situation;
+            
+            // Limpiar y generar las opciones de respuestas
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            questionData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-bounce bg-white border-4 border-gray-100 hover:border-gray-200 p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center text-center soft-shadow transition-all duration-200";
+                btn.onclick = () => selectOption(idx, btn);
+                btn.innerHTML = `
+                    <span class="text-4xl md:text-5xl block mb-2">${opt.emoji}</span>
+                    <span class="text-base md:text-lg font-bold text-gray-700">${opt.text}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            // Leer la pregunta automáticamente tras cargar
+            setTimeout(() => {
+                readQuestionAloud();
+            }, 500);
+        }
+
+        // SELECCIONAR RESPUESTA
+        function selectOption(optIndex, buttonElement) {
+            if (hasAnsweredCurrent) return; // Evitar múltiples respuestas
+            hasAnsweredCurrent = true;
+            
+            // Detener cualquier voz artificial en curso
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+            const questionData = gameQuestions[currentQuestionIdx];
+            const chosenOption = questionData.options[optIndex];
+            
+            const feedbackPanel = document.getElementById('feedback-panel');
+            const feedbackEmoji = document.getElementById('feedback-emoji');
+            const feedbackText = document.getElementById('feedback-text');
+            
+            feedbackPanel.classList.remove('hidden');
+            
+            // Deshabilitar visualmente el resto de las opciones
+            const buttons = document.getElementById('options-container').children;
+            
+            if (chosenOption.isCorrect) {
+                // ¡CORRECTO!
+                score++;
+                playBeep('correct');
+                
+                // Efecto visual al botón seleccionado
+                buttonElement.classList.add('border-green-400', 'bg-green-50');
+                
+                // Mostrar panel de felicitaciones
+                feedbackPanel.classList.add('bg-green-100', 'text-green-800', 'border-2', 'border-green-300');
+                feedbackEmoji.innerText = "🌟 ¡Súper!";
+                feedbackText.innerText = chosenOption.feedback;
+            } else {
+                // INCORRECTO
+                playBeep('wrong');
+                
+                // Efecto visual al botón incorrecto seleccionado
+                buttonElement.classList.add('border-red-300', 'bg-red-50', 'opacity-60');
+                
+                // Mostrar panel de incentivo para intentarlo
+                feedbackPanel.classList.add('bg-orange-100', 'text-orange-800', 'border-2', 'border-orange-300');
+                feedbackEmoji.innerText = "💡 ¡Aprendamos juntos!";
+                feedbackText.innerText = chosenOption.feedback;
+
+                // Marcar sutilmente el correcto con un borde suave para que el niño lo identifique
+                const correctIdx = questionData.options.findIndex(o => o.isCorrect);
+                if (correctIdx !== -1) {
+                    buttons[correctIdx].classList.add('border-green-300', 'bg-green-50');
+                }
+            }
+
+            // Bloquear todos los botones de opciones
+            for(let btn of buttons) {
+                btn.style.pointerEvents = 'none';
+            }
+
+            // Esperar un par de segundos para avanzar de forma amena
+            setTimeout(() => {
+                nextStep();
+            }, 4500);
+        }
+
+        // AVANZAR EN EL JUEGO
+        function nextStep() {
+            currentQuestionIdx++;
+            if (currentQuestionIdx < gameQuestions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // MOSTRAR RESULTADOS FINALES
+        function showResults() {
+            // Cancelar voz
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+            playBeep('complete');
+            
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-results').classList.remove('hidden');
+            
+            // Colocar puntaje numérico
+            document.getElementById('final-score-text').innerText = `${score} / 4`;
+            
+            const badgeEmoji = document.getElementById('result-badge-emoji');
+            const motivationalMsg = document.getElementById('motivational-message');
+            
+            // Mensaje e íconos adaptativos según el resultado
+            if (score === 4) {
+                badgeEmoji.innerText = "👑";
+                motivationalMsg.innerText = "¡Wuuuao! Eres un súper maestro de las emociones. Sabes identificar perfectamente lo que sientes y lo que sienten los demás. ¡Sigue brillando de alegría! ✨😊";
+                startConfetti();
+            } else if (score >= 2) {
+                badgeEmoji.innerText = "🌟";
+                motivationalMsg.innerText = "¡Excelente trabajo! Conoces muy bien tus emociones básicas. Sigue explorando y compartiendo cómo te sientes con las personas que te aman. ¡Eres genial! ❤️👍";
+                startConfetti();
+            } else {
+                badgeEmoji.innerText = "🎈";
+                motivationalMsg.innerText = "¡Bien hecho por intentarlo! Las emociones pueden ser un poco confusas a veces, y está bien no saber todas las respuestas. ¡Prueba otra vez para seguir aprendiendo! 🧸💪";
+            }
+        }
+
+        // REINICIAR TODO
+        function restartGame() {
+            playBeep('click');
+            // Ocultar resultados
+            document.getElementById('screen-results').classList.add('hidden');
+            // Volver a la pantalla 1 de bienvenida y selección de avatar
+            document.getElementById('screen-welcome').classList.remove('hidden');
+            
+            // Parar el confeti si hay alguno activo
+            stopConfetti();
+        }
+
+        // CONTROL DEL WIDGET: EXPLORADOR DE EMOCIONES
+        const emotionDetails = {
+            joy: {
+                title: "😊 La Alegría",
+                desc: "Es como un rayito de sol en tu corazón. Te dan ganas de sonreír, saltar, jugar y abrazar a quienes te rodean.",
+                tip: "Súper consejo: ¡Comparte tu alegría con los demás para que ellos también sonrían!"
+            },
+            sadness: {
+                title: "😢 La Tristeza",
+                desc: "Es como una nube gris y lluviosa. Te hace sentir desganado, cansado y con ganas de llorar. ¡Llorar está bien!",
+                tip: "Súper consejo: Si te sientes triste, cuéntaselo a papá, mamá o a un profesor; un abrazo fuerte cura mucho."
+            },
+            anger: {
+                title: "😡 El Enojo",
+                desc: "Es como un pequeño volcán a punto de estallar en tu pancita. Sientes tu cuerpo caliente y la carita seria.",
+                tip: "Súper consejo: Respira hondo como si soplaras una vela mágica para calmar el volcán."
+            },
+            fear: {
+                title: "😨 El Miedo",
+                desc: "Es como un viento frío que hace que tu corazón lata rápido. Nos ayuda a cuidarnos de los peligros.",
+                tip: "Súper consejo: Cuando tengas miedo, toma la mano de alguien en quien confíes y todo pasará."
+            }
+        };
+
+        function showEmotionInfo(emotionKey) {
+            playBeep('click');
+            const infoPanel = document.getElementById('emotion-info-panel');
+            const data = emotionDetails[emotionKey];
+            
+            document.getElementById('info-title').innerText = data.title;
+            document.getElementById('info-desc').innerText = data.desc;
+            document.getElementById('info-tip').innerText = data.tip;
+            
+            infoPanel.classList.remove('hidden');
+            
+            // Pequeña animación de entrada al panel
+            infoPanel.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                infoPanel.style.transform = 'scale(1)';
+            }, 50);
+
+            // Leer información de la emoción
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const text = `${data.title}. ${data.desc} ${data.tip}`;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-MX';
+                utterance.pitch = 1.25;
+                utterance.rate = 0.95;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // SISTEMA DE CONFETI PARA CELEBRACIÓN (Canvas interno)
+        let canvas, ctx, animationFrameId;
+        let particles = [];
+
+        function startConfetti() {
+            canvas = document.getElementById('confetti-canvas');
+            ctx = canvas.getContext('2d');
+            
+            // Adaptar canvas a las dimensiones físicas de la caja
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+            
+            particles = [];
+            const colors = ['#FF8EB1', '#FFE17D', '#74C0FC', '#63E6BE', '#B197FC'];
+            
+            for (let i = 0; i < 70; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: Math.random() * 6 + 4,
+                    d: Math.random() * canvas.height,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.random() * 10 - 5,
+                    tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+                    tiltAngle: 0
+                });
+            }
+            
+            drawConfetti();
+        }
+
+        function drawConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach((p, idx) => {
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - idx / 3) * 15;
+                
+                ctx.beginPath();
+                ctx.lineWidth = p.r;
+                ctx.strokeStyle = p.color;
+                ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                ctx.stroke();
+                
+                // Reiniciar caída de partículas desde el cielo
+                if (p.y > canvas.height) {
+                    particles[idx] = {
+                        x: Math.random() * canvas.width,
+                        y: -20,
+                        r: p.r,
+                        d: p.d,
+                        color: p.color,
+                        tilt: p.tilt,
+                        tiltAngleIncremental: p.tiltAngleIncremental,
+                        tiltAngle: p.tiltAngle
+                    };
+                }
+            });
+            
+            animationFrameId = requestAnimationFrame(drawConfetti);
+        }
+
+        function stopConfetti() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                const c = document.getElementById('confetti-canvas');
+                if (c) {
+                    const context = c.getContext('2d');
+                    context.clearRect(0, 0, c.width, c.height);
+                }
+            }
+        }
+
+        // Inicializar por defecto la selección del primer avatar en pantalla
+        window.onload = function() {
+            selectAvatar('dog', '🐶');
+        };
+
+        // Escuchar redimensiones para ajustar el canvas de confeti si es necesario
+        window.addEventListener('resize', () => {
+            if (canvas) {
+                canvas.width = canvas.parentElement.offsetWidth;
+                canvas.height = canvas.parentElement.offsetHeight;
+            }
+        });
+    </script>
+</body>
+</html>
