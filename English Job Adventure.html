@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Ruleta de las Profesiones en Inglés! 🎡</title>
+    <!-- Tailwind CSS para diseño rápido y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Freddy/Inter style friendly fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+        }
+        h1, h2, h3, .font-bubble {
+            font-family: 'Fredoka One', cursive;
+        }
+        .bouncy-btn {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bouncy-btn:hover {
+            transform: scale(1.05);
+        }
+        .bouncy-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-teal-100 via-amber-50 to-emerald-100 min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- HEADER / BARRA DE TÍTULO -->
+    <header class="bg-white shadow-md border-b-4 border-emerald-400 py-3 px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <span class="text-3xl animate-bounce">👩‍🏫</span>
+            <div>
+                <h1 class="text-xl md:text-2xl text-emerald-600 tracking-wide">English Jobs Adventure</h1>
+                <p class="text-xs text-slate-500 font-semibold">Tercer Grado • Colegio Rural Colombiano</p>
+            </div>
+        </div>
+        <div class="bg-amber-100 border-2 border-amber-400 px-3 py-1 rounded-full text-xs md:text-sm font-bold text-amber-800 flex items-center gap-1">
+            <span>🔊 Sonidos Activos</span>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL DINÁMICO -->
+    <main class="container mx-auto p-4 flex-grow flex items-center justify-center">
+        
+        <!-- PANTALLA 1: REGISTRO DE PARTICIPANTES -->
+        <section id="screen-register" class="w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-teal-400">
+            <div class="text-center mb-6">
+                <span class="text-6xl">🎡</span>
+                <h2 class="text-3xl text-teal-600 mt-2">¡Bienvenidos a la Ruleta!</h2>
+                <p class="text-slate-600 mt-1 text-sm md:text-base">Registra a los súper estudiantes que van a participar hoy (Máximo 50).</p>
+            </div>
+
+            <!-- Entrada de Nombres -->
+            <div class="bg-teal-50 p-4 rounded-2xl border-2 border-teal-200 mb-6">
+                <label for="student-name" class="block text-sm font-bold text-teal-800 mb-2">Escribe el nombre del estudiante:</label>
+                <div class="flex gap-2">
+                    <input type="text" id="student-name" placeholder="Ej. Camila Torres" maxlength="25"
+                           class="flex-grow px-4 py-3 rounded-xl border-2 border-slate-300 focus:outline-none focus:border-teal-500 text-lg font-semibold">
+                    <button id="btn-add-student" class="bouncy-btn bg-teal-500 hover:bg-teal-600 text-white font-bold px-6 py-3 rounded-xl text-lg shadow-md flex items-center gap-1">
+                        <span>➕</span> Agregar
+                    </button>
+                </div>
+                <p id="register-error" class="text-red-500 text-xs mt-1 font-bold hidden"></p>
+            </div>
+
+            <!-- Listado de Estudiantes -->
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-lg font-bold text-slate-700">Estudiantes Registrados (<span id="student-count">0</span>/50)</h3>
+                    <button id="btn-demo" class="text-xs text-emerald-600 underline font-bold hover:text-emerald-800">Cargar ejemplo de salón rural</button>
+                </div>
+                <div id="students-list" class="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200 min-h-[80px] content-start">
+                    <!-- Se llena dinámicamente -->
+                    <p id="empty-list-msg" class="text-slate-400 text-sm m-auto py-4">No hay estudiantes registrados aún. ¡Agrega algunos!</p>
+                </div>
+            </div>
+
+            <!-- Botón Continuar -->
+            <button id="btn-to-difficulty" disabled 
+                    class="w-full bouncy-btn bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold text-xl py-4 rounded-2xl shadow-lg border-b-4 border-emerald-700 flex justify-center items-center gap-2">
+                ¡Configurar Dificultad! 🚀
+            </button>
+        </section>
+
+        <!-- PANTALLA 2: SELECCIÓN DE DIFICULTAD -->
+        <section id="screen-difficulty" class="w-full max-w-xl bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-purple-400 hidden">
+            <div class="text-center mb-6">
+                <span class="text-6xl">⚙️</span>
+                <h2 class="text-3xl text-purple-600 mt-2">Elige la Dificultad</h2>
+                <p class="text-slate-600 mt-1">Ajusta el reto según el avance del grupo.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <!-- Tarjeta Fácil -->
+                <div id="opt-easy" class="cursor-pointer border-4 border-emerald-400 bg-emerald-50 hover:bg-emerald-100 p-5 rounded-2xl transition duration-200 text-center flex flex-col justify-between items-center relative overflow-hidden group">
+                    <div class="absolute top-2 right-2 bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">Recomendado</div>
+                    <span class="text-5xl group-hover:scale-110 transition-transform duration-200">👨‍🌾</span>
+                    <h3 class="text-xl text-emerald-800 font-bold mt-3">FÁCIL</h3>
+                    <p class="text-xs text-emerald-900 mt-2 font-medium">Los cuestionarios tienen la **imagen o emoji** de la profesión en pantalla para mejor reconocimiento visual.</p>
+                    <div class="mt-4 w-4 h-4 rounded-full border-2 border-emerald-600 flex items-center justify-center p-1">
+                        <div id="opt-easy-dot" class="w-2 h-2 rounded-full bg-emerald-600"></div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Normal -->
+                <div id="opt-normal" class="cursor-pointer border-4 border-slate-200 hover:border-purple-300 bg-white hover:bg-purple-50 p-5 rounded-2xl transition duration-200 text-center flex flex-col justify-between items-center relative group">
+                    <span class="text-5xl group-hover:scale-110 transition-transform duration-200">❓</span>
+                    <h3 class="text-xl text-slate-800 font-bold mt-3">NORMAL</h3>
+                    <p class="text-xs text-slate-600 mt-2">Los cuestionarios **NO tienen imágenes**. Los alumnos leen y escuchan solo la descripción escrita en inglés.</p>
+                    <div class="mt-4 w-4 h-4 rounded-full border-2 border-slate-400 flex items-center justify-center p-1">
+                        <div id="opt-normal-dot" class="w-2 h-2 rounded-full bg-purple-600 hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex gap-4">
+                <button id="btn-back-to-register" class="w-1/3 bouncy-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 rounded-xl border-b-4 border-slate-400">
+                    Atrás
+                </button>
+                <button id="btn-to-roulette" class="w-2/3 bouncy-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl border-b-4 border-purple-800 shadow-lg text-lg flex justify-center items-center gap-2">
+                    ¡Comenzar Juego! 🎮
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA 3: PANTALLA DE LA RULETA -->
+        <section id="screen-roulette" class="w-full max-w-4xl bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-amber-400 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                
+                <!-- Columna Izquierda: Información y Control -->
+                <div class="lg:col-span-5 flex flex-col justify-between h-full order-2 lg:order-1 text-center lg:text-left">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-3 py-1 rounded-full">¡Suerte para todos!</span>
+                        <h2 class="text-3xl text-amber-600 mt-2">La Ruleta de la Ocupación</h2>
+                        <p class="text-slate-600 text-sm mt-2">Cada vez que un estudiante participa, su probabilidad de salir de nuevo disminuye a la mitad (50%), garantizando que todos tengan su oportunidad de jugar.</p>
+                    </div>
+
+                    <!-- Panel de Selección Reciente -->
+                    <div class="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 my-4 text-left">
+                        <h3 class="text-sm font-bold text-amber-800">🎯 Siguiente Turno Para:</h3>
+                        <p id="roulette-winner-display" class="text-2xl font-black text-slate-700 mt-1">¡Gira la ruleta! 🎰</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                        <button id="btn-spin" class="flex-grow bouncy-btn bg-amber-500 hover:bg-amber-600 text-white font-bold text-xl py-4 rounded-2xl border-b-4 border-amber-700 shadow-lg flex justify-center items-center gap-2">
+                            <span>🎡</span> ¡GIRAR!
+                        </button>
+                        <button id="btn-trigger-finish" class="bouncy-btn bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 px-6 rounded-2xl border-b-4 border-rose-700 shadow-md text-sm sm:text-base flex justify-center items-center gap-1">
+                            📊 Finalizar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Visualización del Canvas de la Ruleta -->
+                <div class="lg:col-span-7 flex flex-col items-center justify-center order-1 lg:order-2">
+                    <div class="relative w-72 h-72 sm:w-96 sm:h-96 md:w-[400px] md:h-[400px] p-2 bg-gradient-to-tr from-amber-300 to-amber-100 rounded-full shadow-2xl flex items-center justify-center border-4 border-amber-500">
+                        <!-- Marcador/Flecha Superior -->
+                        <div class="absolute -top-1 z-10 w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-t-[30px] border-t-rose-600 filter drop-shadow-md"></div>
+                        <!-- Canvas Real -->
+                        <canvas id="roulette-canvas" width="500" height="500" class="w-full h-full rounded-full transition-transform duration-75"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PANTALLA 4: CUESTIONARIO INTERACTIVO (3 Preguntas) -->
+        <section id="screen-quiz" class="w-full max-w-3xl bg-white rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-indigo-400 hidden">
+            <!-- Encabezado del Cuestionario -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-indigo-100 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-bold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full uppercase">Cuestionario Activo</span>
+                    <h2 class="text-2xl text-slate-800 mt-1">Estudiante: <span id="quiz-participant-name" class="text-indigo-600 font-extrabold underline decoration-wavy decoration-indigo-300">Camila</span> 🌟</h2>
+                </div>
+                
+                <!-- Indicador de Progreso y Temporizador -->
+                <div class="flex items-center gap-4 justify-between sm:justify-start">
+                    <div class="text-right">
+                        <p class="text-xs text-slate-500 font-bold">Progreso de preguntas</p>
+                        <p class="text-sm font-black text-slate-700"><span id="quiz-current-num">1</span> de 3</p>
+                    </div>
+                    <!-- Temporizador Circular Visual -->
+                    <div class="relative w-16 h-16 flex items-center justify-center rounded-full bg-indigo-50 border-4 border-indigo-400 shadow-inner">
+                        <span id="quiz-timer" class="text-xl font-black text-indigo-700">15</span>
+                        <span class="absolute text-[8px] bottom-1 font-bold text-slate-400">seg</span>
+                    </div>
+                    <!-- Botón Pausa -->
+                    <button id="btn-timer-pause" class="bouncy-btn bg-amber-100 hover:bg-amber-200 text-amber-800 border-2 border-amber-300 p-2 rounded-xl text-xs font-bold flex flex-col items-center">
+                        <span id="pause-icon">⏸️</span>
+                        <span id="pause-text" class="text-[9px]">Pausar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenido de la Pregunta -->
+            <div class="my-4">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <!-- Imagen/Emoji (Solo se muestra en dificultad FÁCIL) -->
+                    <div id="quiz-media-container" class="md:col-span-4 flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100">
+                        <span id="quiz-profession-emoji" class="text-7xl md:text-8xl animate-pulse">👨‍🌾</span>
+                        <div class="mt-2 bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded-full font-bold uppercase" id="quiz-difficulty-tag">Visual</div>
+                    </div>
+                    
+                    <!-- Texto de la Pregunta -->
+                    <div id="quiz-text-container" class="md:col-span-8">
+                        <h3 class="text-lg md:text-xl font-bold text-slate-700 mb-1">Clues / Pistas en inglés:</h3>
+                        <p id="quiz-english-clue" class="text-lg md:text-xl text-indigo-900 bg-indigo-50/50 p-3 rounded-lg border-l-4 border-indigo-500 italic font-medium">"I grow crops and take care of farm animals. Who am I?"</p>
+                        
+                        <!-- Traducción Oculta de las pistas -->
+                        <div id="quiz-translation-box" class="mt-3 p-3 bg-emerald-50 rounded-lg border-l-4 border-emerald-400 hidden">
+                            <p class="text-xs font-bold text-emerald-800 uppercase">Traducción de Pistas:</p>
+                            <p id="quiz-spanish-clue" class="text-xs text-emerald-900 italic font-medium">"Cultivo alimentos y cuido animales de granja. ¿Quién soy?"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opciones de Respuesta -->
+            <div class="my-6">
+                <p class="text-xs font-bold text-slate-500 mb-2 uppercase">Selecciona la opción correcta:</p>
+                <div class="grid grid-cols-1 gap-3">
+                    <button id="opt-0" class="quiz-option w-full py-4 px-6 text-left text-lg font-bold rounded-2xl border-3 border-slate-200 hover:border-indigo-400 bg-white hover:bg-indigo-50 transition duration-150 flex justify-between items-center group">
+                        <span class="option-text">Option A</span>
+                        <span class="option-badge hidden text-xl"></span>
+                    </button>
+                    <button id="opt-1" class="quiz-option w-full py-4 px-6 text-left text-lg font-bold rounded-2xl border-3 border-slate-200 hover:border-indigo-400 bg-white hover:bg-indigo-50 transition duration-150 flex justify-between items-center group">
+                        <span class="option-text">Option B</span>
+                        <span class="option-badge hidden text-xl"></span>
+                    </button>
+                    <button id="opt-2" class="quiz-option w-full py-4 px-6 text-left text-lg font-bold rounded-2xl border-3 border-slate-200 hover:border-indigo-400 bg-white hover:bg-indigo-50 transition duration-150 flex justify-between items-center group">
+                        <span class="option-text">Option C</span>
+                        <span class="option-badge hidden text-xl"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botones de Acción Especiales (Mostrar Respuesta y Siguiente) -->
+            <div class="flex flex-col sm:flex-row gap-3 justify-between items-center border-t-2 border-indigo-100 pt-4">
+                <button id="btn-show-answer" class="w-full sm:w-auto bouncy-btn bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-xl border-b-4 border-emerald-700 shadow-md flex justify-center items-center gap-1 text-sm">
+                    🔍 Mostrar respuesta correcta y traducción
+                </button>
+                
+                <button id="btn-next-question" disabled class="w-full sm:w-auto bouncy-btn bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-xl border-b-4 border-indigo-800 shadow-md flex justify-center items-center gap-1 text-sm">
+                    Siguiente Pregunta ➡️
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA 5: PANTALLA DE RESULTADOS FINALES -->
+        <section id="screen-results" class="w-full max-w-4xl bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-emerald-500 hidden">
+            <div class="text-center mb-6">
+                <span class="text-6xl">🏆</span>
+                <h2 class="text-3xl text-emerald-600 mt-2">Resultados Generales de la Actividad</h2>
+                <p class="text-slate-600 mt-1">¡Felicitaciones a todos por el gran esfuerzo!</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                
+                <!-- Tarjeta de Participantes Registrados con sus notas -->
+                <div class="bg-emerald-50/50 p-4 rounded-2xl border-2 border-emerald-200 flex flex-col">
+                    <h3 class="text-lg font-bold text-emerald-800 mb-3 flex items-center gap-1">
+                        <span>✅</span> Estudiantes que ya Participaron
+                    </h3>
+                    <div id="results-participated-list" class="flex-grow space-y-2 max-h-64 overflow-y-auto pr-2">
+                        <!-- Llenado dinámicamente -->
+                        <p class="text-slate-400 text-sm italic m-auto text-center py-4">Nadie ha participado aún.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Estudiantes Pendientes -->
+                <div class="bg-rose-50/50 p-4 rounded-2xl border-2 border-rose-200 flex flex-col">
+                    <h3 class="text-lg font-bold text-rose-800 mb-3 flex items-center gap-1">
+                        <span>⏳</span> Faltaron por Participar
+                    </h3>
+                    <div id="results-pending-list" class="flex-grow space-y-2 max-h-64 overflow-y-auto pr-2">
+                        <!-- Llenado dinámicamente -->
+                        <p class="text-slate-400 text-sm italic m-auto text-center py-4">¡Todos participaron!</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Botones de Acción Final -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button id="btn-back-to-roulette" class="flex-grow bouncy-btn bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-4 rounded-xl border-b-4 border-slate-400 text-center">
+                    🔄 Regresar a la ruleta
+                </button>
+                <button id="btn-reset-all" class="flex-grow bouncy-btn bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 rounded-xl border-b-4 border-rose-700 text-center">
+                    ❌ Borrar todo y Reiniciar
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ALERTA / BANNER INFORMATIVO (Personalizado en vez de alerts) -->
+    <div id="alert-box" class="fixed top-4 right-4 z-50 bg-slate-800 text-white font-bold px-6 py-4 rounded-2xl shadow-2xl border-2 border-amber-400 flex items-center gap-3 max-w-sm transform translate-y-[-150%] transition-transform duration-300">
+        <span id="alert-emoji" class="text-2xl">⚠️</span>
+        <p id="alert-message" class="text-sm">Mensaje de alerta</p>
+    </div>
+
+    <!-- FOOTER / CRÉDITOS -->
+    <footer class="bg-slate-100 text-slate-500 py-3 text-center text-xs font-semibold border-t border-slate-200">
+        Diseñado con propósitos instruccionales pedagógicos para Escuelas Rurales • Colombia, 2026.
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        
+        // Contexto de Audio Seguro
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        // Sintetizadores de Audio nativos para evitar fallos de conexión a internet
+        function playSoundTick() {
+            try {
+                let ctx = getAudioContext();
+                let osc = ctx.createOscillator();
+                let gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, ctx.currentTime);
+                gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.06);
+            } catch (e) { console.log(e); }
+        }
+
+        function playSoundCorrect() {
+            try {
+                let ctx = getAudioContext();
+                let now = ctx.currentTime;
+                [440, 554.37, 659.25, 880].forEach((freq, i) => {
+                    let osc = ctx.createOscillator();
+                    let gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.08);
+                    gain.gain.setValueAtTime(0.06, now + i * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.08 + 0.25);
+                    osc.start(now + i * 0.08);
+                    osc.stop(now + i * 0.08 + 0.25);
+                });
+            } catch (e) { console.log(e); }
+        }
+
+        function playSoundWrong() {
+            try {
+                let ctx = getAudioContext();
+                let now = ctx.currentTime;
+                [220, 165].forEach((freq, i) => {
+                    let osc = ctx.createOscillator();
+                    let gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.15);
+                    gain.gain.setValueAtTime(0.08, now + i * 0.15);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.15 + 0.3);
+                    osc.start(now + i * 0.15);
+                    osc.stop(now + i * 0.15 + 0.3);
+                });
+            } catch (e) { console.log(e); }
+        }
+
+        function playSoundWin() {
+            try {
+                let ctx = getAudioContext();
+                let now = ctx.currentTime;
+                [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                    let osc = ctx.createOscillator();
+                    let gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.06);
+                    gain.gain.setValueAtTime(0.08, now + i * 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.06 + 0.3);
+                    osc.start(now + i * 0.06);
+                    osc.stop(now + i * 0.06 + 0.3);
+                });
+            } catch (e) { console.log(e); }
+        }
+
+        
+        // Profesiones u Ocupaciones en inglés adaptadas a niños de 3er grado
+        const professionsPool = [
+            {
+                emoji: "👨‍🌾",
+                profession: "Farmer",
+                spanish: "Agricultor / Campesino",
+                clueEng: "I work in the field. I grow corn, potatoes and fruit. I take care of farm animals. Who am I?",
+                clueEsp: "Trabajo en el campo. Cultivo maíz, papas y frutas. Cuido animales de la granja. ¿Quién soy?",
+                options: ["Farmer", "Doctor", "Pilot"]
+            },
+            {
+                emoji: "👩‍🏫",
+                profession: "Teacher",
+                spanish: "Profesor / Profesora",
+                clueEng: "I work at a school. I write on the board and help children learn English and math. Who am I?",
+                clueEsp: "Trabajo en una escuela. Escribo en el tablero y ayudo a los niños a aprender inglés y matemáticas. ¿Quién soy?",
+                options: ["Chef", "Teacher", "Baker"]
+            },
+            {
+                emoji: "👩‍⚕️",
+                profession: "Doctor",
+                spanish: "Médico / Médica",
+                clueEng: "I work in a hospital. I check your health and give medicine when you are sick. Who am I?",
+                clueEsp: "Trabajo en un hospital. Reviso tu salud y te doy medicina cuando estás enfermo/a. ¿Quién soy?",
+                options: ["Vet", "Doctor", "Firefighter"]
+            },
+            {
+                emoji: "🧑‍🚒",
+                profession: "Firefighter",
+                spanish: "Bombero / Bombera",
+                clueEng: "I wear a red helmet. I drive a big red truck and put out dangerous fires. Who am I?",
+                clueEsp: "Uso un casco rojo. Conduzco un camión rojo grande y apago fuegos peligrosos. ¿Quién soy?",
+                options: ["Firefighter", "Police Officer", "Pilot"]
+            },
+            {
+                emoji: "👨‍🍳",
+                profession: "Chef",
+                spanish: "Cocinero / Cocinera",
+                clueEng: "I wear a tall white hat. I work in a kitchen and cook delicious food. Who am I?",
+                clueEsp: "Uso un sombrero blanco alto. Trabajo en la cocina y preparo comida deliciosa. ¿Quién soy?",
+                options: ["Teacher", "Baker", "Chef"]
+            },
+            {
+                emoji: "👮",
+                profession: "Police Officer",
+                spanish: "Policía",
+                clueEng: "I wear a blue uniform. I protect people, patrol the streets and maintain safety. Who am I?",
+                clueEsp: "Uso un uniforme azul. Protejo a las personas, patrullo las calles y mantengo la seguridad. ¿Quién soy?",
+                options: ["Police Officer", "Vet", "Doctor"]
+            },
+            {
+                emoji: "🐱",
+                profession: "Vet",
+                spanish: "Veterinario / Veterinaria",
+                clueEng: "I am a doctor for animals. I cure sick dogs, cats, cows, and horses. Who am I?",
+                clueEsp: "Soy un doctor para animales. Curo perritos, gatitos, vacas y caballos enfermos. ¿Quién soy?",
+                options: ["Doctor", "Vet", "Farmer"]
+            },
+            {
+                emoji: "👩‍✈️",
+                profession: "Pilot",
+                spanish: "Piloto",
+                clueEng: "I travel in the sky. I fly large airplanes carrying passengers to other countries. Who am I?",
+                clueEsp: "Viajo por el cielo. Vuelo aviones grandes llevando pasajeros a otros países. ¿Quién soy?",
+                options: ["Pilot", "Firefighter", "Singer"]
+            },
+            {
+                emoji: "🍞",
+                profession: "Baker",
+                spanish: "Panadero / Panadera",
+                clueEng: "I wake up very early. I bake fresh bread, delicious cookies and cakes in the bakery. Who am I?",
+                clueEsp: "Me despierto muy temprano. Horneo pan fresco, deliciosas galletas y pasteles en la panadería. ¿Quién soy?",
+                options: ["Baker", "Chef", "Teacher"]
+            },
+            {
+                emoji: "🎤",
+                profession: "Singer",
+                spanish: "Cantante",
+                clueEng: "I use a microphone. I sing beautiful songs on a stage or on the radio. Who am I?",
+                clueEsp: "Uso un micrófono. Canto hermosas canciones en un escenario o en la radio. ¿Quién soy?",
+                options: ["Singer", "Pilot", "Police Officer"]
+            },
+            {
+                emoji: "🔨",
+                profession: "Carpenter",
+                spanish: "Carpintero / Carpintera",
+                clueEng: "I work with wood. I use a hammer and saw to build tables, chairs, and doors. Who am I?",
+                clueEsp: "Trabajo con madera. Uso un martillo y una sierra para fabricar mesas, sillas y puertas. ¿Quién soy?",
+                options: ["Carpenter", "Farmer", "Baker"]
+            },
+            {
+                emoji: "🦷",
+                profession: "Dentist",
+                spanish: "Dentista / Odontólogo",
+                clueEng: "I look inside your mouth. I clean your teeth and fix cavities so you have a pretty smile. Who am I?",
+                clueEsp: "Miro dentro de tu boca. Limpio tus dientes y reparo las caries para que tengas una sonrisa bonita. ¿Quién soy?",
+                options: ["Doctor", "Dentist", "Vet"]
+            }
+        ];
+
+
+        let participants = []; // Formato: { id, name, weight: 1.0, countPlayed: 0, score: 0 }
+        let currentDifficulty = 'easy'; // 'easy' | 'normal'
+        let selectedWinnerIndex = null;
+        
+        // Estado del Cuestionario Activo
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let timerVal = 15;
+        let timerInterval = null;
+        let isTimerPaused = false;
+        let hasAnswered = false; // Bloquea elecciones repetidas por pregunta
+        
+        // Elementos del DOM
+        const screenRegister = document.getElementById('screen-register');
+        const screenDifficulty = document.getElementById('screen-difficulty');
+        const screenRoulette = document.getElementById('screen-roulette');
+        const screenQuiz = document.getElementById('screen-quiz');
+        const screenResults = document.getElementById('screen-results');
+
+
+        function showAlert(message, emoji = '⚠️') {
+            const alertBox = document.getElementById('alert-box');
+            const alertMsg = document.getElementById('alert-message');
+            const alertEmoji = document.getElementById('alert-emoji');
+            
+            alertMsg.textContent = message;
+            alertEmoji.textContent = emoji;
+            
+            alertBox.classList.remove('translate-y-[-150%]');
+            
+            setTimeout(() => {
+                alertBox.classList.add('translate-y-[-150%]');
+            }, 3500);
+        }
+
+
+        const studentInput = document.getElementById('student-name');
+        const btnAddStudent = document.getElementById('btn-add-student');
+        const studentsList = document.getElementById('students-list');
+        const studentCount = document.getElementById('student-count');
+        const btnToDifficulty = document.getElementById('btn-to-difficulty');
+        const btnDemo = document.getElementById('btn-demo');
+        const emptyListMsg = document.getElementById('empty-list-msg');
+
+        // Renderizar Lista
+        function updateParticipantsList() {
+            studentsList.innerHTML = '';
+            if (participants.length === 0) {
+                studentsList.appendChild(emptyListMsg);
+                btnToDifficulty.disabled = true;
+                studentCount.textContent = '0';
+                return;
+            }
+
+            emptyListMsg.remove();
+            studentCount.textContent = participants.length;
+            btnToDifficulty.disabled = participants.length === 0;
+
+            participants.forEach((st, idx) => {
+                const tag = document.createElement('div');
+                tag.className = "flex items-center gap-1.5 bg-indigo-50 border-2 border-indigo-200 px-3 py-1.5 rounded-full text-sm font-bold text-indigo-800 animate-fadeIn";
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = st.name;
+                
+                const delBtn = document.createElement('button');
+                delBtn.className = "text-rose-500 hover:text-rose-700 font-extrabold ml-1 cursor-pointer focus:outline-none";
+                delBtn.textContent = '×';
+                delBtn.onclick = () => removeParticipant(st.id);
+
+                tag.appendChild(nameSpan);
+                tag.appendChild(delBtn);
+                studentsList.appendChild(tag);
+            });
+        }
+
+        function addParticipant(name) {
+            const cleanName = name.trim();
+            if (!cleanName) {
+                showAlert("Por favor, escribe un nombre válido.");
+                return;
+            }
+            if (participants.some(p => p.name.toLowerCase() === cleanName.toLowerCase())) {
+                showAlert("Este estudiante ya se encuentra registrado.");
+                return;
+            }
+            if (participants.length >= 50) {
+                showAlert("Has alcanzado el límite máximo de 50 estudiantes.");
+                return;
+            }
+
+            participants.push({
+                id: Date.now() + Math.random().toString(36).substr(2, 5),
+                name: cleanName,
+                weight: 1.0, // Peso inicial completo
+                countPlayed: 0,
+                score: 0
+            });
+
+            studentInput.value = '';
+            studentInput.focus();
+            updateParticipantsList();
+            playSoundTick();
+        }
+
+        function removeParticipant(id) {
+            participants = participants.filter(p => p.id !== id);
+            updateParticipantsList();
+            playSoundWrong();
+        }
+
+        btnAddStudent.onclick = () => addParticipant(studentInput.value);
+        studentInput.onkeypress = (e) => {
+            if (e.key === 'Enter') addParticipant(studentInput.value);
+        };
+
+        // Demo rápida de salón rural (Carga nombres por defecto para evaluación rápida)
+        btnDemo.onclick = () => {
+            const demoNames = [
+                "Camila Torres", "Mateo Gómez", "Samuel Díaz", 
+                "Valentina Ruiz", "Sebastián Soto", "Lucía Ospina", 
+                "Andrés Castro", "Sofía Marín"
+            ];
+            participants = [];
+            demoNames.forEach(name => {
+                participants.push({
+                    id: Math.random().toString(36).substr(2, 9),
+                    name: name,
+                    weight: 1.0,
+                    countPlayed: 0,
+                    score: 0
+                });
+            });
+            updateParticipantsList();
+            showAlert("¡Cargados 8 estudiantes de ejemplo!", "🎒");
+            playSoundCorrect();
+        };
+
+        // Navegación de Registro a Selección de Dificultad
+        btnToDifficulty.onclick = () => {
+            getAudioContext(); // Activar audio bajo interacción del usuario
+            screenRegister.classList.add('hidden');
+            screenDifficulty.classList.remove('hidden');
+            playSoundCorrect();
+        };
+
+
+        const optEasy = document.getElementById('opt-easy');
+        const optNormal = document.getElementById('opt-normal');
+        const optEasyDot = document.getElementById('opt-easy-dot');
+        const optNormalDot = document.getElementById('opt-normal-dot');
+        const btnBackToRegister = document.getElementById('btn-back-to-register');
+        const btnToRoulette = document.getElementById('btn-to-roulette');
+
+        optEasy.onclick = () => {
+            currentDifficulty = 'easy';
+            optEasy.classList.add('border-emerald-400', 'bg-emerald-50');
+            optEasy.classList.remove('border-slate-200', 'bg-white');
+            optNormal.classList.add('border-slate-200', 'bg-white');
+            optNormal.classList.remove('border-purple-300', 'bg-purple-50');
+            optEasyDot.classList.remove('hidden');
+            optNormalDot.classList.add('hidden');
+            playSoundTick();
+        };
+
+        optNormal.onclick = () => {
+            currentDifficulty = 'normal';
+            optNormal.classList.add('border-purple-400', 'bg-purple-50');
+            optNormal.classList.remove('border-slate-200', 'bg-white');
+            optEasy.classList.add('border-slate-200', 'bg-white');
+            optEasy.classList.remove('border-emerald-400', 'bg-emerald-50');
+            optNormalDot.classList.remove('hidden');
+            optEasyDot.classList.add('hidden');
+            playSoundTick();
+        };
+
+        btnBackToRegister.onclick = () => {
+            screenDifficulty.classList.add('hidden');
+            screenRegister.classList.remove('hidden');
+            playSoundTick();
+        };
+
+        btnToRoulette.onclick = () => {
+            screenDifficulty.classList.add('hidden');
+            screenRoulette.classList.remove('hidden');
+            playSoundCorrect();
+            // Inicializar o ajustar el canvas de la ruleta
+            initRoulette();
+        };
+
+
+        const canvas = document.getElementById('roulette-canvas');
+        const ctx = canvas.getContext('2d');
+        const btnSpin = document.getElementById('btn-spin');
+        const rouletteWinnerDisplay = document.getElementById('roulette-winner-display');
+        const btnTriggerFinish = document.getElementById('btn-trigger-finish');
+
+        let isSpinning = false;
+        let currentAngle = 0; // Ángulo actual de rotación
+
+        // Definir una paleta de colores de alto contraste para los estudiantes en la ruleta
+        const colors = [
+            "#F59E0B", "#10B981", "#3B82F6", "#8B5CF6", "#EC4899", 
+            "#EF4444", "#06B6D4", "#84CC16", "#14B8A6", "#6366F1"
+        ];
+
+        // Función para calcular los sectores según la probabilidad (peso de cada participante)
+        function getSlices() {
+            const totalWeight = participants.reduce((sum, p) => sum + p.weight, 0);
+            let currentSum = 0;
+            return participants.map((p, idx) => {
+                const angleSize = (p.weight / totalWeight) * (2 * Math.PI);
+                const start = currentSum;
+                const end = currentSum + angleSize;
+                currentSum = end;
+                return {
+                    participant: p,
+                    startAngle: start,
+                    endAngle: end,
+                    color: colors[idx % colors.length]
+                };
+            });
+        }
+
+        // Dibujar Ruleta en Canvas
+        function drawRoulette(rotation = 0) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 10;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const slices = getSlices();
+            
+            slices.forEach(slice => {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                // Dibujamos el arco aplicando la rotación actual de la ruleta
+                ctx.arc(centerX, centerY, radius, slice.startAngle + rotation, slice.endAngle + rotation);
+                ctx.closePath();
+                ctx.fillStyle = slice.color;
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.stroke();
+
+                // Añadir Nombre del Estudiante
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                const midAngle = slice.startAngle + (slice.endAngle - slice.startAngle) / 2 + rotation;
+                ctx.rotate(midAngle);
+                
+                // Formato de Texto para legibilidad rural
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 16px Quicksand, sans-serif';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                ctx.shadowBlur = 4;
+                ctx.textAlign = 'right';
+                
+                // Truncar nombre si es muy largo
+                let displayName = slice.participant.name;
+                if (displayName.length > 12) {
+                    displayName = displayName.substring(0, 10) + '...';
+                }
+                
+                ctx.fillText(displayName, radius - 25, 6);
+                ctx.restore();
+            });
+
+            // Decorar el círculo central
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 35, 0, 2 * Math.PI);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+            ctx.shadowBlur = 10;
+            ctx.fill();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#F59E0B';
+            ctx.stroke();
+
+            // Dibujar carita feliz en el centro
+            ctx.fillStyle = '#D97706';
+            ctx.font = '24px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🎓', centerX, centerY);
+        }
+
+        function initRoulette() {
+            currentAngle = 0;
+            drawRoulette(0);
+            rouletteWinnerDisplay.textContent = "¡Gira la ruleta! 🎰";
+            btnSpin.disabled = false;
+        }
+
+
+        function spinRoulette() {
+            if (isSpinning || participants.length === 0) return;
+            
+            isSpinning = true;
+            btnSpin.disabled = true;
+            playSoundTick();
+
+            // 1. Determinar el ganador mediante selección aleatoria ponderada (Weighted Random)
+            const totalWeight = participants.reduce((sum, p) => sum + p.weight, 0);
+            let r = Math.random() * totalWeight;
+            let cumulative = 0;
+            let winnerIdx = 0;
+            
+            for (let i = 0; i < participants.length; i++) {
+                cumulative += participants[i].weight;
+                if (r <= cumulative) {
+                    winnerIdx = i;
+                    break;
+                }
+            }
+            
+            selectedWinnerIndex = winnerIdx;
+            const winner = participants[winnerIdx];
+
+            // 2. Calcular los ángulos para detenerse perfectamente alineado
+            const slices = getSlices();
+            const winnerSlice = slices[winnerIdx];
+            const winnerSliceMid = winnerSlice.startAngle + (winnerSlice.endAngle - winnerSlice.startAngle) / 2;
+
+            // Para que se posicione en el indicador superior (flecha a 270 grados o 1.5 * Math.PI)
+            // Necesitamos que: (winnerSliceMid + RotacionFinal) % 2PI == 1.5 * PI
+            const targetRotation = (1.5 * Math.PI - winnerSliceMid);
+            
+            // Añadir varias vueltas completas (entre 5 y 8 vueltas) para que sea emocionante
+            const totalRotations = targetRotation + (2 * Math.PI * (5 + Math.floor(Math.random() * 3)));
+            
+            // Animación de Giro usando requestAnimationFrame y suavizado cúbico
+            const startAngle = currentAngle % (2 * Math.PI);
+            const startTime = performance.now();
+            const duration = 4500; // Duración emocionante de 4.5 segundos
+
+            function easeOutCubic(t) {
+                return 1 - Math.pow(1 - t, 3);
+            }
+
+            let lastTickTime = 0;
+
+            function animateSpin(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const ease = easeOutCubic(progress);
+                currentAngle = startAngle + (totalRotations - startAngle) * ease;
+                
+                drawRoulette(currentAngle);
+
+                // Sonido de "clic" en base a la rotación de los sectores
+                if (now - lastTickTime > 120 && progress < 0.95) {
+                    playSoundTick();
+                    lastTickTime = now;
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateSpin);
+                } else {
+                    // Finalizó la animación de giro
+                    isSpinning = false;
+                    rouletteWinnerDisplay.innerHTML = `⭐ <span class="text-indigo-600 font-extrabold">${winner.name}</span> ⭐`;
+                    playSoundWin();
+
+                    // Esperar un momento y lanzar el cuestionario para este estudiante
+                    setTimeout(() => {
+                        startQuizForParticipant(winner);
+                    }, 1500);
+                }
+            }
+
+            requestAnimationFrame(animateSpin);
+        }
+
+        btnSpin.onclick = () => {
+            getAudioContext();
+            spinRoulette();
+        };
+
+
+        const quizParticipantName = document.getElementById('quiz-participant-name');
+        const quizCurrentNum = document.getElementById('quiz-current-num');
+        const quizTimer = document.getElementById('quiz-timer');
+        const btnTimerPause = document.getElementById('btn-timer-pause');
+        const pauseIcon = document.getElementById('pause-icon');
+        const pauseText = document.getElementById('pause-text');
+        
+        const quizMediaContainer = document.getElementById('quiz-media-container');
+        const quizProfessionEmoji = document.getElementById('quiz-profession-emoji');
+        const quizDifficultyTag = document.getElementById('quiz-difficulty-tag');
+        const quizEnglishClue = document.getElementById('quiz-english-clue');
+        const quizSpanishClue = document.getElementById('quiz-spanish-clue');
+        const quizTranslationBox = document.getElementById('quiz-translation-box');
+        
+        const btnShowAnswer = document.getElementById('btn-show-answer');
+        const btnNextQuestion = document.getElementById('btn-next-question');
+
+        // Configurar preguntas para el turno del estudiante seleccionado
+        function startQuizForParticipant(participant) {
+            screenRoulette.classList.add('hidden');
+            screenQuiz.classList.remove('hidden');
+
+            quizParticipantName.textContent = participant.name;
+            currentQuestions = getRandomQuestions(3); // Obtener 3 preguntas aleatorias de la bolsa de forma no repetitiva
+            currentQuestionIndex = 0;
+            
+            // Resetear el puntaje temporal de este turno
+            participant.tempScore = 0;
+
+            loadQuestion();
+        }
+
+        // Obtener un subconjunto aleatorio de preguntas sin repetir
+        function getRandomQuestions(num) {
+            const shuffled = [...professionsPool].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, num);
+        }
+
+        function loadQuestion() {
+            hasAnswered = false;
+            isTimerPaused = false;
+            timerVal = 15;
+            
+            quizCurrentNum.textContent = currentQuestionIndex + 1;
+            quizTimer.textContent = timerVal;
+            
+            // Resetear estados del temporizador
+            pauseIcon.textContent = "⏸️";
+            pauseText.textContent = "Pausar";
+            
+            // Ocultar traducción de pistas al inicio
+            quizTranslationBox.classList.add('hidden');
+            btnShowAnswer.disabled = false;
+            btnNextQuestion.disabled = true;
+
+            const q = currentQuestions[currentQuestionIndex];
+
+            // Renderizado Condicional según Dificultad
+            if (currentDifficulty === 'easy') {
+                quizMediaContainer.classList.remove('hidden');
+                quizProfessionEmoji.textContent = q.emoji;
+                quizDifficultyTag.textContent = "Fácil: Con Imagen";
+                quizDifficultyTag.className = "mt-2 bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full font-bold uppercase";
+            } else {
+                quizMediaContainer.classList.add('hidden'); // Ocultar imagen en nivel normal
+            }
+
+            quizEnglishClue.textContent = `"${q.clueEng}"`;
+            quizSpanishClue.textContent = `"${q.clueEsp}"`;
+
+            // Preparar las opciones de respuesta
+            const shuffledOptions = [...q.options].sort(() => 0.5 - Math.random());
+            
+            for (let i = 0; i < 3; i++) {
+                const optButton = document.getElementById(`opt-${i}`);
+                const optText = optButton.querySelector('.option-text');
+                const optBadge = optButton.querySelector('.option-badge');
+                
+                optText.textContent = shuffledOptions[i];
+                optBadge.classList.add('hidden');
+                optBadge.textContent = '';
+                
+                // Clases por defecto del botón
+                optButton.className = "quiz-option w-full py-4 px-6 text-left text-lg font-bold rounded-2xl border-3 border-slate-200 hover:border-indigo-400 bg-white hover:bg-indigo-50 transition duration-150 flex justify-between items-center group cursor-pointer";
+                
+                // Evento click de la opción
+                optButton.onclick = () => selectOption(shuffledOptions[i], optButton, q.profession);
+            }
+
+            // Iniciar el temporizador regresivo de 15 segundos
+            startTimer();
+        }
+
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!isTimerPaused) {
+                    timerVal--;
+                    quizTimer.textContent = timerVal;
+                    
+                    if (timerVal <= 4 && timerVal > 0) {
+                        playSoundTick();
+                        quizTimer.classList.add('text-rose-500', 'scale-110');
+                    } else {
+                        quizTimer.classList.remove('text-rose-500', 'scale-110');
+                    }
+
+                    if (timerVal <= 0) {
+                        clearInterval(timerInterval);
+                        timeOutAction();
+                    }
+                }
+            }, 1000);
+        }
+
+        btnTimerPause.onclick = () => {
+            if (hasAnswered) return; // No se puede pausar si ya respondió
+            isTimerPaused = !isTimerPaused;
+            if (isTimerPaused) {
+                pauseIcon.textContent = "▶️";
+                pauseText.textContent = "Reanudar";
+                // Deshabilitar momentáneamente los botones de opción para evitar trampas
+                toggleOptionsActive(false);
+            } else {
+                pauseIcon.textContent = "⏸️";
+                pauseText.textContent = "Pausar";
+                toggleOptionsActive(true);
+            }
+            playSoundTick();
+        };
+
+        function toggleOptionsActive(active) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                if (active) {
+                    opt.classList.remove('opacity-50', 'pointer-events-none');
+                } else {
+                    opt.classList.add('opacity-50', 'pointer-events-none');
+                }
+            });
+        }
+
+        function timeOutAction() {
+            hasAnswered = true;
+            toggleOptionsActive(false);
+            showAlert("¡Se acabó el tiempo de esta pregunta!", "⏰");
+            playSoundWrong();
+            btnNextQuestion.disabled = false;
+        }
+
+
+        function selectOption(selectedVal, optionElement, correctProfession) {
+            if (hasAnswered || isTimerPaused) return;
+            
+            hasAnswered = true;
+            clearInterval(timerInterval);
+            toggleOptionsActive(false);
+
+            const optBadge = optionElement.querySelector('.option-badge');
+            optBadge.classList.remove('hidden');
+
+            const currentParticipant = participants[selectedWinnerIndex];
+
+            if (selectedVal === correctProfession) {
+                // Respuesta Correcta
+                optionElement.className = "quiz-option w-full py-4 px-6 text-left text-lg font-bold rounded-2xl border-3 border-emerald-400 bg-emerald-100 text-emerald-800 flex justify-between items-center";
+                optBadge.textContent = '✅';
+                playSoundCorrect();
+                currentParticipant.tempScore++;
+            } else {
+                // Respuesta Incorrecta (No muestra la correcta automáticamente a no ser que se pulse el botón de mostrar)
+                optionElement.className = "quiz-option w-full py-4 px-6 text-left text-lg font-bold rounded-2xl border-3 border-rose-400 bg-rose-100 text-rose-800 flex justify-between items-center";
+                optBadge.textContent = '❌';
+                playSoundWrong();
+            }
+
+            btnNextQuestion.disabled = false;
+        }
+
+        // Mostrar Respuesta Pedagógica
+        btnShowAnswer.onclick = () => {
+            const q = currentQuestions[currentQuestionIndex];
+            
+            // Mostrar la traducción de las pistas
+            quizTranslationBox.classList.remove('hidden');
+
+            // Encontrar qué opción es la correcta en los botones para destacarla en color esmeralda suave
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                const text = opt.querySelector('.option-text').textContent;
+                if (text === q.profession) {
+                    opt.className = "quiz-option w-full py-4 px-6 text-left text-lg font-bold rounded-2xl border-3 border-emerald-400 bg-emerald-50 text-emerald-800 flex justify-between items-center font-bold";
+                    const badge = opt.querySelector('.option-badge');
+                    badge.classList.remove('hidden');
+                    badge.textContent = `🎯 (${q.spanish})`;
+                }
+            });
+
+            btnShowAnswer.disabled = true;
+            playSoundTick();
+        };
+
+        // Pasar a la siguiente pregunta o culminar turno
+        btnNextQuestion.onclick = () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < 3) {
+                loadQuestion();
+            } else {
+                // Guardar puntajes finales del turno
+                const currentParticipant = participants[selectedWinnerIndex];
+                currentParticipant.countPlayed++;
+                currentParticipant.score = Math.max(currentParticipant.score || 0, currentParticipant.tempScore);
+
+                // ¡REGLA CLAVE!: Disminuir la probabilidad de este participante a la mitad para la siguiente ronda
+                currentParticipant.weight *= 0.5;
+
+                showAlert(`¡Turno de ${currentParticipant.name} terminado! Consiguió ${currentParticipant.tempScore}/3 puntos.`, "🎉");
+                
+                // Retornar a la ruleta
+                screenQuiz.classList.add('hidden');
+                screenRoulette.classList.remove('hidden');
+                
+                initRoulette();
+            }
+            playSoundTick();
+        };
+
+
+        btnTriggerFinish.onclick = () => {
+            screenRoulette.classList.add('hidden');
+            screenResults.classList.remove('hidden');
+            renderFinalResults();
+            playSoundWin();
+        };
+
+        function renderFinalResults() {
+            const resultsParticipatedList = document.getElementById('results-participated-list');
+            const resultsPendingList = document.getElementById('results-pending-list');
+
+            resultsParticipatedList.innerHTML = '';
+            resultsPendingList.innerHTML = '';
+
+            const playedList = participants.filter(p => p.countPlayed > 0);
+            const pendingList = participants.filter(p => p.countPlayed === 0);
+
+            // Renderizar Participantes Activos con medallas según puntaje
+            if (playedList.length === 0) {
+                resultsParticipatedList.innerHTML = `<p class="text-slate-400 text-sm italic py-4 text-center">Nadie ha participado todavía.</p>`;
+            } else {
+                // Ordenar por mayor puntaje
+                playedList.sort((a, b) => b.score - a.score);
+                
+                playedList.forEach(p => {
+                    const row = document.createElement('div');
+                    row.className = "flex justify-between items-center bg-white p-3 rounded-xl border border-emerald-200 shadow-sm";
+                    
+                    let medal = "⭐️";
+                    if (p.score === 3) medal = "🥇 ¡Perfecto!";
+                    else if (p.score === 2) medal = "🥈 ¡Excelente!";
+                    else if (p.score === 1) medal = "🥉 ¡Bien hecho!";
+
+                    row.innerHTML = `
+                        <div>
+                            <span class="font-bold text-slate-800 text-sm md:text-base">${p.name}</span>
+                            <span class="block text-[10px] text-slate-400">Participó ${p.countPlayed} vez/veces</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-black text-emerald-600 block text-sm md:text-base">${p.score} / 3 Correctas</span>
+                            <span class="text-xs font-semibold text-amber-600">${medal}</span>
+                        </div>
+                    `;
+                    resultsParticipatedList.appendChild(row);
+                });
+            }
+
+            // Renderizar Estudiantes que faltaron por participar
+            if (pendingList.length === 0) {
+                resultsPendingList.innerHTML = `
+                    <div class="text-center py-6 bg-emerald-50 rounded-xl border border-emerald-100">
+                        <span class="text-3xl">🥳</span>
+                        <p class="text-emerald-800 text-sm font-bold mt-2">¡Felicitaciones!</p>
+                        <p class="text-emerald-600 text-xs mt-0.5">Todos los estudiantes registrados jugaron hoy.</p>
+                    </div>
+                `;
+            } else {
+                pendingList.forEach(p => {
+                    const row = document.createElement('div');
+                    row.className = "bg-white p-3 rounded-xl border border-rose-100 shadow-sm flex items-center justify-between";
+                    row.innerHTML = `
+                        <span class="font-bold text-slate-700 text-sm">${p.name}</span>
+                        <span class="text-xs bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-bold">Pendiente ⏳</span>
+                    `;
+                    resultsPendingList.appendChild(row);
+                });
+            }
+        }
+
+        // Navegación de vuelta a la ruleta desde resultados
+        document.getElementById('btn-back-to-roulette').onclick = () => {
+            screenResults.classList.add('hidden');
+            screenRoulette.classList.remove('hidden');
+            initRoulette();
+            playSoundTick();
+        };
+
+        // Reinicio Total de la Actividad
+        document.getElementById('btn-reset-all').onclick = () => {
+            if (confirm("¿Estás seguro de que deseas borrar los estudiantes registrados y reiniciar todo el juego?")) {
+                participants = [];
+                updateParticipantsList();
+                screenResults.classList.add('hidden');
+                screenRegister.classList.remove('hidden');
+                playSoundWrong();
+            }
+        };
+
+        // Ejecución de renderizado inicial al cargar la página
+        window.onload = function () {
+            updateParticipantsList();
+        };
+    </script>
+</body>
+</html>
