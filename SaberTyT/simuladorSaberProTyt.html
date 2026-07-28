@@ -1,0 +1,1685 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Simulador Saber Pro/TyT · Normalistas Superiores</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%233B2A1E'/%3E%3Cpath d='M22 54 L44 74 L80 28' stroke='%23FBF1E1' stroke-width='11' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root{
+    --ink:#3B2A1E;
+    --ink-soft:#6d5a45;
+    --paper:#FBF1E1;
+    --paper-2:#F0DEC0;
+    --line:#dcc4a0;
+    --magenta:#B5492A;
+    --magenta-deep:#8C3620;
+    --gold:#BD8A2E;
+    --forest:#5F7A3D;
+    --brick:#8C2F26;
+    --white:#FFFBF3;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top left, rgba(181,73,42,0.06), transparent 45%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Source Serif 4', Georgia, serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  #root{max-width:920px;margin:0 auto;padding:28px 20px 80px;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--magenta-deep); font-weight:700;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif; font-weight:600; margin:0; letter-spacing:-0.01em;}
+  .masthead{
+    border-bottom:3px double var(--ink);
+    padding-bottom:16px; margin-bottom:28px;
+    display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;
+  }
+  .masthead h1{font-size:30px; color:var(--ink);}
+  .masthead .sub{color:var(--ink-soft); font-size:14px; margin-top:4px; font-style:italic;}
+  .badge-seal{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.05em;
+    border:1.5px solid var(--magenta-deep); color:var(--magenta-deep);
+    padding:5px 10px; border-radius:100px; white-space:nowrap;
+    transform:rotate(-2deg);
+  }
+
+  /* ---- Setup screen ---- */
+  .card{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:24px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.04);
+  }
+  .card + .card{margin-top:18px;}
+  .field-label{
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-soft); margin-bottom:10px; display:block;
+  }
+  .choice-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px;}
+  .choice{
+    border:1.5px solid var(--line); background:var(--paper);
+    border-radius:var(--radius); padding:14px 16px; cursor:pointer;
+    transition:border-color .15s, background .15s, transform .1s;
+    font-family:'Source Serif 4',serif;
+  }
+  .choice:hover{border-color:var(--magenta);}
+  .choice.selected{border-color:var(--magenta-deep); background:#f6e2d2; box-shadow:inset 0 0 0 1px var(--magenta-deep);}
+  .choice h4{margin:0 0 4px; font-family:'Fraunces',serif; font-size:16px; font-weight:600;}
+  .choice p{margin:0; font-size:12.5px; color:var(--ink-soft); line-height:1.4;}
+
+  .btn{
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase;
+    border:1.5px solid var(--ink); background:var(--ink); color:var(--white);
+    padding:12px 22px; border-radius:var(--radius); cursor:pointer;
+    transition:opacity .15s, transform .08s;
+  }
+  .btn:hover{opacity:.88;}
+  .btn:active{transform:translateY(1px);}
+  .btn.secondary{background:transparent; color:var(--ink); border-color:var(--ink);}
+  .btn.magenta{background:var(--magenta-deep); border-color:var(--magenta-deep);}
+  .btn:disabled{opacity:.35; cursor:not-allowed;}
+  .btn-row{display:flex; gap:10px; margin-top:22px; flex-wrap:wrap;}
+
+  /* ---- Quiz screen ---- */
+  .quizbar{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); margin-bottom:10px;
+  }
+  .progress-track{height:6px; background:var(--paper-2); border-radius:6px; overflow:hidden; margin-bottom:22px;}
+  .progress-fill{height:100%; background:var(--magenta-deep); transition:width .3s;}
+  .timer{
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:13px;
+    padding:3px 10px; border:1px solid var(--line); border-radius:100px;
+  }
+  .timer.low{color:var(--brick); border-color:var(--brick);}
+
+  .qmeta{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+  .tag{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em; text-transform:uppercase;
+    padding:4px 9px; border-radius:100px; border:1px solid var(--line); color:var(--ink-soft);
+  }
+  .tag.comp{border-color:var(--gold); color:#7a5f1c;}
+  .tag.dif-baja{border-color:var(--forest); color:var(--forest);}
+  .tag.dif-media{border-color:var(--gold); color:#7a5f1c;}
+  .tag.dif-alta{border-color:var(--brick); color:var(--brick);}
+
+  .enunciado{font-size:17px; line-height:1.65; margin-bottom:22px;}
+  .opciones{display:flex; flex-direction:column; gap:10px;}
+  .op{
+    display:flex; gap:14px; align-items:flex-start;
+    border:1.5px solid var(--line); border-radius:var(--radius); padding:14px 16px;
+    cursor:pointer; background:var(--white); transition:border-color .15s, background .15s;
+  }
+  .op:hover{border-color:var(--magenta);}
+  .op .letra{
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:13px;
+    width:26px; height:26px; min-width:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    border:1.5px solid var(--ink); color:var(--ink);
+  }
+  .op p{margin:0; line-height:1.5; font-size:15px; padding-top:2px;}
+  .op.selected{border-color:var(--ink); background:var(--paper);}
+  .op.selected .letra{background:var(--ink); color:var(--white);}
+
+  .op.correct{border-color:var(--forest); background:#eef2df;}
+  .op.correct .letra{background:var(--forest); color:var(--white); border-color:var(--forest);}
+  .op.wrong{border-color:var(--brick); background:#f5ded7;}
+  .op.wrong .letra{background:var(--brick); color:var(--white); border-color:var(--brick);}
+  .op.disabled{cursor:default;}
+
+  .feedback{margin-top:18px; border-radius:var(--radius); overflow:hidden;}
+  .feedback-head{
+    padding:12px 16px; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.05em; text-transform:uppercase;
+    font-weight:700; display:flex; align-items:center; gap:10px;
+  }
+  .feedback-head.ok{background:var(--forest); color:var(--white);}
+  .feedback-head.no{background:var(--brick); color:var(--white);}
+  .feedback-body{border:1.5px solid var(--line); border-top:none; padding:16px; background:var(--white); font-size:14.5px; line-height:1.6;}
+  .feedback-body .why{margin-bottom:10px;}
+  .feedback-body .why b{font-family:'Fraunces',serif;}
+  .feedback-body .invalid-item{margin-bottom:8px; color:var(--ink-soft);}
+  .feedback-body .invalid-item b{color:var(--ink);}
+  .no-explic{color:var(--ink-soft); font-style:italic; font-size:13.5px;}
+
+  .stamp{
+    display:inline-block; transform:rotate(-6deg);
+    border:2.5px solid var(--forest); color:var(--forest);
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:11px; letter-spacing:.08em;
+    padding:4px 10px; border-radius:4px; margin-left:auto;
+  }
+  .stamp.no{border-color:var(--brick); color:var(--brick); transform:rotate(4deg);}
+
+  /* ---- Results ---- */
+  .score-hero{
+    text-align:center; padding:32px 20px 26px; border-bottom:3px double var(--ink); margin-bottom:24px;
+  }
+  .score-num{font-family:'Fraunces',serif; font-size:64px; font-weight:700; color:var(--magenta-deep); line-height:1;}
+  .score-label{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin-top:6px;}
+
+  .comp-row{display:flex; align-items:center; gap:14px; padding:11px 0; border-bottom:1px solid var(--paper-2);}
+  .comp-row .name{flex:0 0 250px; font-size:13.5px; line-height:1.35;}
+  .comp-bar-track{flex:1; height:10px; background:var(--paper-2); border-radius:6px; overflow:hidden;}
+  .comp-bar-fill{height:100%; border-radius:6px;}
+  .comp-row .frac{font-family:'JetBrains Mono',monospace; font-size:12px; width:52px; text-align:right; color:var(--ink-soft);}
+
+  .failed-list{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+  .failed-pill{
+    font-family:'JetBrains Mono',monospace; font-size:12px; border:1px solid var(--brick); color:var(--brick);
+    padding:4px 10px; border-radius:100px;
+  }
+
+  .tabbar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
+  .tab-btn{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.05em; text-transform:uppercase;
+    padding:10px 16px; border-radius:100px; border:1.5px solid var(--line); background:var(--white); color:var(--ink-soft);
+    cursor:pointer; transition:border-color .15s, background .15s, color .15s;
+  }
+  .tab-btn:hover{border-color:var(--magenta);}
+  .tab-btn.active{background:var(--ink); border-color:var(--ink); color:var(--white);}
+
+  .hint{font-size:13px; color:var(--ink-soft); margin-top:6px;}
+  .center{text-align:center;}
+  a.textlink{color:var(--magenta-deep); cursor:pointer; text-decoration:underline;}
+  ::selection{background:var(--magenta); color:white;}
+  @media (max-width:600px){
+    .comp-row{flex-wrap:wrap;}
+    .comp-row .name{flex:1 1 100%;}
+    .score-num{font-size:48px;}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+const COMPETENCIAS = {
+  formar: {
+    fis: "Comprende las características físicas, intelectuales y sociales de sus estudiantes",
+    cul: "Entiende la importancia del desarrollo cultural de sus estudiantes",
+    vin: "Vincula sus prácticas educativas con la institución como centro de desarrollo social y cultural",
+    pro: "Comprende sus propios procesos de desarrollo profesional y busca mejoramiento continuo"
+  },
+  evaluar: {
+    alt: "Conoce diversas alternativas para evaluar",
+    imp: "Comprende el impacto de la evaluación en el mejoramiento de los procesos educativos",
+    aut: "Comprende la relevancia de la autorregulación en los sujetos de la educación"
+  },
+  ensenar: {
+    dis: "Diseña proyectos curriculares, planes de estudio y unidades de aprendizaje",
+    act: "Promueve actividades de enseñanza-aprendizaje (desarrollo conceptual, actitudinal, procedimental)",
+    did: "Comprende el uso de la didáctica de las disciplinas en la enseñanza"
+  }
+};
+
+const MODULOS = {
+  formar: {
+    titulo: "Formar",
+    subtitulo: "Interacción entre el profesor, sus estudiantes y la comunidad",
+    preguntas: [
+      {n:1, comp:"fis", dif:null, correcta:"D",
+        enun:"La salida pedagógica de los estudiantes del grado octavo fue suspendida por las directivas de la institución educativa porque en los últimos tres años siempre se han presentado problemas como el consumo de bebidas alcohólicas, cigarrillo o salidas del lugar sin permiso del profesor encargado. Los estudiantes consideran injusta la medida, porque ellos no hicieron parte de los problemas y, en consecuencia, deciden entrar a clases solamente cuando se autorice la salida. Un profesor decide mediar entre los estudiantes y las directivas, y aprovecha la situación para lograr interacciones formativas. Por esto, considera que la situación más favorable para ello es",
+        ops:{A:"convocar a los padres de familia para que se comprometan con el buen comportamiento de sus hijos y soliciten a las directivas autorizar la salida.",
+             B:"invitar a una reunión a los estudiantes de noveno, décimo y undécimo grado para que respondan por sus actos y soliciten a las directivas autorizar la salida.",
+             C:"reunir a los estudiantes de octavo grado y pedirles que cada uno escriba su compromiso de buen comportamiento para enviarlos a las directivas.",
+             D:"realizar debates abiertos entre los integrantes de la comunidad educativa, a fin de concertar otras formas comunicativas abiertas a la multiplicidad."}},
+      {n:2, comp:"cul", dif:null, correcta:"A",
+        enun:"Un profesor implementa en sus clases actividades de reflexión sobre situaciones cotidianas con sus estudiantes, reconociendo que este tipo de actividades favorecen significativamente su formación ciudadana y social. Luego de observar los efectos de estas actividades, el profesor decide incluir en sus clases escenarios de participación a fin de propiciar un espacio en el cual sus estudiantes puedan reflexionar a partir de sus aprendizajes. De acuerdo con lo anterior, el propósito de incluir escenarios de participación es",
+        ops:{A:"favorecer la adquisición de destrezas propositivas en sus estudiantes.",
+             B:"contrastar su práctica educativa con las actividades que él ha propuesto.",
+             C:"mejorar su relación con los estudiantes y con la comunidad educativa.",
+             D:"examinar la imagen que los estudiantes tienen del saber que aprenden."}},
+      {n:3, comp:"cul", dif:null, correcta:"C",
+        enun:"Los profesores de un Centro Educativo rural, que trabaja con enfoque de Escuela Nueva, son conscientes de la importancia de una buena nutrición para mejorar los procesos de aprendizaje de sus estudiantes, y han visto con preocupación que un alto porcentaje de ellos presenta problemas de rendimiento escolar asociados a una alimentación deficiente. De acuerdo con el planteamiento anterior, la acción más acertada de la institución educativa para actuar con prontitud y buscar soluciones integrales es",
+        ops:{A:"vincular al sector de la salud para la valoración del estado nutricional de los estudiantes.",
+             B:"informar a los padres de familia sobre la situación, para que modifiquen sus hábitos alimentarios.",
+             C:"realizar un proyecto comunitario sobre hábitos alimentarios y comunicar a las autoridades municipales.",
+             D:"remitir los casos agudos de desnutrición al ICBF y hacer el seguimiento correspondiente."}},
+      {n:4, comp:"cul", dif:null, correcta:"D",
+        enun:"El entorno de una institución educativa se ha llenado de afiches, pendones, pasacalles y vallas con todo tipo de información; ante esta contaminación visual, los profesores de los grados 10.º y 11.º ven en esta situación una oportunidad para integrar los problemas de contaminación y su prevención a las prácticas ambientales previstas en el Proyecto Educativo Institucional (PEI) y en las políticas de educación ambiental. Para ello, deciden",
+        ops:{A:"realizar con los estudiantes un recuento, ubicación y categorización de los afiches, pendones, pasacalles y vallas de la localidad.",
+             B:"propiciar espacios de reflexión con todos los profesores de Ciencias Naturales y Sociales para incorporar el tema de la contaminación visual.",
+             C:"realizar actividades ecológicas escolares para eliminar el uso de afiches, pendones, pasacalles y vallas en la institución y sus alrededores.",
+             D:"propiciar el desarrollo de proyectos de educación ambiental con la comunidad, con miras a la resolución conjunta de esta problemática."}},
+      {n:5, comp:"fis", dif:null, correcta:"B",
+        enun:"Un grupo de estudiantes pide apoyo a un profesor acerca de una campaña que quisieran adelantar en el colegio, en pro de las familias damnificadas por el invierno (participantes: estudiantes, profesores, padres y funcionarios; tipos de ayudas: alimentos, ropa, calzado, utensilios). Luego de conocer la propuesta, el profesor se interesa en la campaña y decide acompañar a los estudiantes en su ejecución. En la situación anterior, se puede afirmar que la intención del profesor al participar es",
+        ops:{A:"fomentar la participación de la familia en las actividades del colegio.",
+             B:"promover en sus estudiantes el desarrollo de una actitud solidaria.",
+             C:"crear en la comunidad una imagen prestigiosa de la institución.",
+             D:"despertar la confianza y el respeto de sus estudiantes hacia él."}},
+      {n:6, comp:"cul", dif:null, correcta:"D",
+        enun:"Con el propósito de mejorar las condiciones ambientales de una institución educativa, el coordinador de Sociales les propone a los profesores de su área desarrollar un proyecto en el que participen los estudiantes de los diferentes grados y se comuniquen utilizando internet. Durante el desarrollo de este proyecto, se espera que los estudiantes",
+        ops:{A:"incrementen su comunicación a través de internet, sin la intermediación de los profesores en el aula.",
+             B:"utilicen libremente la información que circula a través de internet.",
+             C:"aprovechen internet para la adquisición de información sobre los temas ambientales.",
+             D:"intercambien ideas a través de internet en equipo para alcanzar metas conjuntas."}},
+      {n:7, comp:"cul", dif:"baja", correcta:"C",
+        enun:"Al comenzar el año escolar, los profesores de noveno grado de una institución educativa deciden implementar una estrategia para estimular en los estudiantes la elaboración de alternativas de solución para problemas comunitarios; para ello, eligen uno relacionado con el sistema de acueducto y alcantarillado de su localidad. Con esta estrategia se busca que los estudiantes",
+        ops:{A:"indaguen con los expertos en el tema sobre las mejores alternativas de solución para este problema.",
+             B:"consulten textos en la biblioteca para identificar posibles causas del problema.",
+             C:"construyan opciones viables a partir del análisis de las causas del problema.",
+             D:"divulguen entre la comunidad las soluciones que se han usado para resolver problemas similares."},
+        expl:{correcta:"La respuesta C conlleva a los estudiantes a la elaboración de alternativas de solución para problemas comunitarios. Para ello, es necesario la construcción de opciones viables en relación con el problema examinando sus causas.",
+              invalidas:{A:"No es correcta, porque quienes plantean las alternativas para la solución del problema son los expertos y no los estudiantes.",
+                         B:"No plantea alternativas de solución. Por el contrario, propone identificar posibles causas al problema a partir de textos. No contempla que las causas sean identificadas por los estudiantes al observar y analizar las problemáticas asociadas al sistema de acueducto y alcantarillado de su localidad.",
+                         D:"La divulgación de las soluciones a la comunidad es un resultado que se debe dar luego de abordar el problema, estudiarlo y encontrar algunas alternativas de solución."}}},
+      {n:8, comp:"vin", dif:null, correcta:"A",
+        enun:"En un Proyecto Educativo Institucional, se tiene como meta, para los programas relacionados con la gestión a la comunidad, contribuir con la formación de actores sociales con capacidad de comprensión y transformación de su contexto. Consecuente con ello, el criterio más relevante y formativo que deben cumplir las propuestas que realice la institución para enfrentar los desafíos de la comunidad es",
+        ops:{A:"promover la autogestión de proyectos.",
+             B:"desarrollar la capacidad de trabajo en equipo.",
+             C:"facilitar la participación de la comunidad.",
+             D:"difundir los programas institucionales."}},
+      {n:9, comp:"vin", dif:null, correcta:"D",
+        enun:"Los directivos docentes y los profesores de una institución educativa deciden revisar la estructura de su sistema de autoevaluación institucional, apoyados en la coherencia, la congruencia y la pertinencia. En este proceso, la revisión de los proyectos curriculares de área muestra fortalezas específicamente en la pertinencia. La pertinencia de los proyectos curriculares se evidencia cuando en la definición de sus objetivos y en sus ámbitos temáticos y problemáticos reconocen:",
+        ops:{A:"Los contenidos contextualizados y una formación para el desarrollo de competencias.",
+             B:"Las necesidades de los estudiantes y el consenso sobre la propuesta educativa de las áreas.",
+             C:"La normatividad educativa y las teorías y métodos de las disciplinas objeto de enseñanza.",
+             D:"La lectura crítica del entorno sociocultural y los principios misionales de la institución."}},
+      {n:10, comp:"vin", dif:"media", correcta:"B",
+        enun:"La Constitución Política de 1991 y la Ley General de Educación (115 de 1994) otorgan a los padres de familia el título de miembros de la comunidad educativa y los convoca a participar en diversas instancias de la gestión escolar. Desde esta perspectiva, el compromiso de los padres de familia con la formación escolar de sus hijos implica",
+        ops:{A:"aportar los recursos económicos necesarios y enseñar las normas de comportamiento en el hogar.",
+             B:"intercambiar orientaciones sobre los procesos formativos y participar en el mejoramiento institucional.",
+             C:"asistir a los eventos programados por la institución y velar por la prestación del servicio educativo.",
+             D:"recibir información sobre el comportamiento y rendimiento académico para tomar medidas a tiempo."},
+        expl:{correcta:"La respuesta B establece el papel activo de los padres de familia en los procesos formativos. De acuerdo con las políticas educativas, es necesario intercambiar con cada uno de los estamentos de la comunidad educativa (incluyendo a los padres de familia) orientaciones sobre la gestión escolar. Parte de esta gestión es abordar el plan de mejoramiento institucional.",
+              invalidas:{A:"Los padres de familia no tienen solamente la responsabilidad de aportar los recursos económicos y formar desde el hogar, sino que también deben participar en procesos de formación acordados institucionalmente.",
+                         C:"Además de asistir a los eventos programados o recibir un informe convivencial o académico, los padres deben ser actores y partícipes de las decisiones que se toman a nivel institucional en las diferentes áreas de gestión que orienta el PEI.",
+                         D:"Igual que C: no basta con recibir información periódica; se requiere participación activa en las decisiones institucionales."}}},
+      {n:11, comp:"vin", dif:"alta", correcta:"A",
+        enun:"Después de la autoevaluación institucional, los miembros de una comunidad educativa deciden redefinir el vínculo entre escuela y familia y modificar las prácticas de interacción, de manera que respondan a un enfoque menos operativo y más holístico. Para el nuevo enfoque se requiere:",
+        ops:{A:"el compromiso recíproco de la escuela y la familia, para tomar decisiones conjuntas a favor del desarrollo de los estudiantes.",
+             B:"el intercambio de información entre la escuela y la familia, para lograr la intervención de los padres en el rendimiento académico de sus hijos.",
+             C:"el complemento entre la escuela y la familia, para que la escuela responda por los conocimientos y la familia por los principios.",
+             D:"el encuentro entre la escuela y la familia, para cumplir la normatividad vigente y los compromisos adquiridos al firmar la matrícula."},
+        expl:{correcta:"La respuesta A muestra el vínculo entre la escuela y la familia como parte fundamental del PEI. Un enfoque holístico implica un compromiso recíproco escuela/familia para la toma de decisiones en pro de la formación y el desarrollo integral de los estudiantes.",
+              invalidas:{B:"Al tener en cuenta un enfoque holístico, no basta con un intercambio de información entre la escuela y la familia; eso pertenece a los procesos de comunicación interna y externa a nivel institucional.",
+                         C:"No es correcto afirmar que el complemento se centra en que la familia aporta los principios y la escuela los conocimientos. Ambos aspectos implican una corresponsabilidad.",
+                         D:"Los padres de familia tienen una función más allá de cumplir con la normatividad y los compromisos de matrícula; desde un enfoque holístico, familia y escuela se encuentran en un compromiso conjunto."}}},
+      {n:12, comp:"fis", dif:null, correcta:"C",
+        enun:"Las directivas y los profesores de una institución educativa están empeñados en la búsqueda de alternativas pedagógico-didácticas que pongan el acento y el protagonismo en sus estudiantes, a fin de que asuman posturas más reflexivas y críticas sobre las condiciones sociales que agobian el entorno institucional, caracterizado por escasez de recursos, desempleo, desplazamiento e intolerancia por disimilitud de prácticas culturales. En este sentido, las propuestas educativas deben apuntar a trabajar fuertemente a favor de:",
+        ops:{A:"El fortalecimiento de la identidad institucional y el compromiso con el proyecto de vida personal.",
+             B:"El compromiso con el manual de convivencia y el respeto a los puntos de vista propios y ajenos.",
+             C:"Las prácticas que favorezcan la inclusión, la valoración de la diversidad y el manejo de conflictos.",
+             D:"Las actividades que promuevan la responsabilidad, la aceptación de las dificultades y la confianza."}},
+      {n:13, comp:"fis", dif:null, correcta:"B",
+        enun:"En Colombia, el fortalecimiento de actitudes positivas que favorezcan en los estudiantes la coherencia entre sus concepciones y sus prácticas democráticas es un propósito educativo que se logra con el desarrollo de competencias ciudadanas. La actividad que resulta más conveniente para promover actitudes democráticas en los estudiantes es",
+        ops:{A:"consultar el significado de actitudes democráticas.",
+             B:"participar en el desarrollo de un proyecto de aula.",
+             C:"conocer los principios del Proyecto Educativo Institucional.",
+             D:"recibir lecciones sobre competencias ciudadanas."}},
+      {n:14, comp:"fis", dif:null, correcta:"A",
+        enun:"A su ingreso en el aula, un profesor encuentra que dos estudiantes están agrediéndose física y verbalmente. Luego de detener el altercado, el profesor les pide regresar a sus lugares y da inicio a las actividades programadas. Para superar estas agresiones, el profesor y el equipo de profesores pueden diseñar y aplicar estrategias pedagógicas en las cuales se desarrollen:",
+        ops:{A:"Actividades que estimulen la convivencia y el respeto por la diferencia entre estudiantes.",
+             B:"Clases que contribuyan a mantener buenos niveles de disciplina y atención entre los estudiantes.",
+             C:"Acciones adecuadas sobre el conocimiento y cumplimiento de los estudiantes del manual de convivencia.",
+             D:"Reuniones con las familias de los estudiantes para informarles sobre las sanciones a los estudiantes."}},
+      {n:15, comp:"pro", dif:null, correcta:"C",
+        enun:"\"Los estudiantes de una institución se caracterizan por su excelencia académica, por respetar diferentes perspectivas y modos de pensar, ser críticos y buscar situaciones creativas a problemas complejos\" (PEI, colegio Y). Algunos profesores quieren desarrollar una investigación para evidenciar las características de los estudiantes que se mencionan en el PEI. La mejor metodología para llevar a cabo la investigación es",
+        ops:{A:"comparar los resultados de los estudiantes en Saber 11, con los resultados de los estudiantes de la institución y los resultados de estudiantes de instituciones cercanas.",
+             B:"realizar una prueba de pensamiento crítico y creativo a los estudiantes de undécimo grado y mirar qué cantidad de estudiantes están por encima del promedio.",
+             C:"comparar los resultados de los estudiantes tanto en la prueba de Saber 11, como en la prueba de pensamiento crítico y creativo y buscar correlaciones.",
+             D:"realizar una prueba de pensamiento crítico y creativo a estudiantes de noveno y undécimo grados y comparar los dos grados entre sí."}},
+      {n:16, comp:"pro", dif:null, correcta:"D",
+        enun:"\"...a un profesor reflexivo no solo lo constituye la probidad intelectual de utilizar procesos cognoscitivos de análisis interno de los fenómenos curriculares y educativos, sino también la realización de actividades afectivas y morales en las aulas, en la comunidad escolar y en las asociaciones sociopolíticas\" (Villar, 1999, p. 22). De acuerdo con lo anterior, actuar reflexivamente favorece el desarrollo profesional de los profesores, ya que permite",
+        ops:{A:"poder involucrarse en las expectativas de los estudiantes.",
+             B:"intervenir para sistematizar hábitos en los estudiantes.",
+             C:"estandarizar las habilidades de pensamiento de los estudiantes.",
+             D:"comprender las realidades escolares de los estudiantes."}},
+      {n:17, comp:"vin", dif:null, correcta:"D",
+        enun:"El currículo tradicional o fragmentado se organiza según el supuesto de que las materias disciplinares pueden enseñarse de manera desconectada de las necesidades e intereses de los estudiantes. Por su parte, el currículo integral se organiza desde una perspectiva experiencial de la educación. Desde esta perspectiva, el trabajo por proyectos permite organizar el currículo teniendo como referente",
+        ops:{A:"los conceptos disciplinarios fundamentales.",
+             B:"las habilidades prerrequisito de conceptos previos.",
+             C:"la estructura distintiva de las disciplinas.",
+             D:"las prácticas confrontadoras y contextualizadas."}},
+      {n:18, comp:"vin", dif:null, correcta:"C",
+        enun:"En una reunión de directivas para identificar oportunidades de mejoramiento, la coordinadora de convivencia manifestó su preocupación ante la exclusión de los niños indígenas de los juegos por algunos grupos de muchachos y la discriminación de género en los espacios de recreación. El rector considera que esta problemática debe abordarse de manera colectiva con los padres de familia y la comunidad en general, porque la formación ciudadana trasciende el aula. Esto contribuye a",
+        ops:{A:"prevenir los conflictos entre estudiantes y profesores.",
+             B:"promover la justicia social y proteger los Derechos Humanos.",
+             C:"crear contextos y prácticas de inclusión y respeto mutuo.",
+             D:"transformar la convivencia fuera de la institución educativa."}},
+      {n:19, comp:"fis", dif:null, correcta:"B",
+        enun:"Frente a una situación de conflicto percibida en una institución educativa y que afecta la convivencia de los estudiantes, el papel de los profesores debe ser",
+        ops:{A:"organizar equipos colaborativos que busquen disminuir las consecuencias que a futuro pueda tener el problema.",
+             B:"identificar los orígenes del problema a fin de sugerir acciones alternativas que permitan superar la situación.",
+             C:"solicitar la intervención de un profesional en psicología para que, con base en soportes teóricos, él proponga soluciones viables al problema.",
+             D:"indagar por las percepciones que las directivas tienen acerca del problema para posteriormente tomar decisiones."}},
+      {n:20, comp:"cul", dif:null, correcta:"A",
+        enun:"De acuerdo con la Ley General de Educación, el Proyecto Educativo Institucional (PEI) es el resultado de una construcción colectiva y dinámica que expresa el compromiso de la institución con la formación integral de los estudiantes. El concepto de formación integral abarca la preparación de los estudiantes para el ejercicio de la ciudadanía como miembros activos de una comunidad; en ese sentido, se busca fortalecer en los estudiantes",
+        ops:{A:"la autonomía y participación democrática en diversos contextos.",
+             B:"la solidaridad y apropiación de los valores tradicionales del país.",
+             C:"la identidad y aprendizaje de los símbolos patrios de la nación.",
+             D:"la disciplina y adquisición de conocimientos cívicos relevantes."}},
+      {n:21, comp:"cul", dif:null, correcta:"D",
+        enun:"Los profesores de una institución educativa consideran el desarrollo del compromiso ambiental un componente importante en la formación integral de los estudiantes. Por tanto, proponen llevar a cabo un proyecto transversal que les permita comprender a los estudiantes la relación de interdependencia del ser humano con el medio. El proceso más adecuado para lograr este propósito es",
+        ops:{A:"la búsqueda y el acceso a información sobre el impacto de los productos científicos y tecnológicos en el entorno natural.",
+             B:"el estudio de los derechos constitucionales colectivos y del ambiente para exigir su respeto ante las autoridades competentes.",
+             C:"el diseño de actividades que incluyan la enseñanza y el aprendizaje de los valores y actitudes de respeto por el ambiente natural.",
+             D:"la participación en la identificación de problemas ambientales de su entorno y en el diseño de propuestas de solución viables."}},
+      {n:22, comp:"pro", dif:null, correcta:"C",
+        enun:"En una institución educativa, profesores de diferentes áreas conforman un grupo de estudio que tiene como objetivo consolidar una línea de investigación sobre prácticas educativas basada en la reciprocidad y el intercambio de propuestas disciplinares. De acuerdo con el objetivo del grupo, el propósito más pertinente es",
+        ops:{A:"integrar el conocimiento cotidiano con el contexto institucional.",
+             B:"relacionar la teoría educativa con las estrategias metodológicas.",
+             C:"realizar proyectos interdisciplinares basados en el diálogo de saberes.",
+             D:"fortalecer las relaciones entre los profesores con trabajos colectivos."}},
+      {n:23, comp:"vin", dif:null, correcta:"C",
+        enun:"Una institución educativa, que se preocupa por involucrar a padres de familia y acudientes en el proceso de formación de sus estudiantes, solicita al equipo de profesores implementar acciones a favor de este propósito en sus prácticas educativas. La mejor actividad que puede contribuir con este fin es",
+        ops:{A:"realizar una encuesta abierta que permita identificar los estudiantes que viven con sus padres y aquellos que viven con su(s) acudiente(s).",
+             B:"convocar a una reunión de padres y acudientes para conocer los hábitos de estudio de los estudiantes en sus hogares.",
+             C:"invitar a padres y acudientes para que participen con los estudiantes en experiencias que se relacionen con los temas de las clases.",
+             D:"consultar con padres y acudientes sus opiniones acerca de endurecer las normas que orientan la convivencia entre estudiantes."}}
+    ]
+  },
+
+  evaluar: {
+    titulo: "Evaluar",
+    subtitulo: "Naturaleza, propósito e impacto de la evaluación educativa",
+    preguntas: [
+      {n:1, comp:"alt", dif:null, correcta:"D",
+        enun:"En la evaluación de impacto de un Proyecto Educativo Institucional (PEI), se tienen en cuenta los resultados de los aprendizajes de los estudiantes en relación con la organización curricular, entre otros factores. Con base en lo anterior, los resultados de las pruebas Saber se convierten en una herramienta para",
+        ops:{A:"conocer la interrelación de los estudiantes con el profesor y el interés por el área que enseña.",
+             B:"determinar las prácticas de enseñanza y las formas que usa el profesor para recoger información.",
+             C:"determinar el dominio que el profesor tiene del saber que enseña y la incidencia de las metodologías.",
+             D:"hacer seguimiento a la práctica educativa e introducir acciones de mejora en los procesos formativos."}},
+      {n:2, comp:"alt", dif:null, correcta:"D",
+        enun:"Según Rafael Flórez (1999), un currículo es mucho más que un plan de estudios porque implica \"una concepción acerca de los contenidos, las experiencias, la actuación y la secuencia para que los alumnos alcancen las metas de formación\" (p. 82). Desde esta perspectiva, el currículo se evalúa con",
+        ops:{A:"modelos exclusivamente cuantitativos que dan cuenta de los logros de los estudiantes.",
+             B:"secuencias de contenidos de las materias y su apropiación por parte de los estudiantes.",
+             C:"participaciones de los estudiantes a través de sus opiniones y expectativas de aprendizaje.",
+             D:"modelos cualitativos que valoran el conjunto de procesos y transacciones que ocurren en su desarrollo."}},
+      {n:3, comp:"imp", dif:null, correcta:"D",
+        enun:"La evaluación es una acción eminentemente social que implica situar las actividades en un contexto amplio que además incluye lo económico y lo político. Con base en el contexto planteado, se puede afirmar sobre la evaluación que",
+        ops:{A:"corresponde a los profesores diseñar pruebas acordes con las características del currículo y definir sus logros.",
+             B:"requiere de pruebas nacionales para así dar cuenta de su amplitud y establecer modelos comparativos.",
+             C:"trasciende el momento de aplicación de exámenes en el aula y la valoración de los trabajos de los estudiantes.",
+             D:"articula las dimensiones pedagógica, metodológica y ética para definir los procesos y modelos por utilizar."}},
+      {n:4, comp:"alt", dif:null, correcta:"D",
+        enun:"El propósito más relevante, cuando un profesor realiza evaluaciones continuas que expresan su carácter formativo y ofrecen condiciones para la participación de los estudiantes en la definición de variables e indicadores es",
+        ops:{A:"determinar los conocimientos y las habilidades del estudiante en diferentes saberes.",
+             B:"hacer visible la capacidad del estudiante para aplicar los conocimientos en las prácticas.",
+             C:"registrar los procesos de cambio del estudiante y comunicarle los resultados obtenidos.",
+             D:"favorecer la autorregulación del estudiante sobre su aprendizaje, desempeño y resultados."}},
+      {n:5, comp:"imp", dif:null, correcta:"C",
+        enun:"La evaluación es un proceso de naturaleza social y ética encaminado a la mejora de la educación en general y, en particular, de sus procesos, actores y agentes. No obstante, desde comienzos del siglo XXI, en Colombia ha ido adquiriendo cada vez más peso político en la medida en que en muchos casos se ha sobredimensionado la medición de los resultados como indicador principal de la calidad de la educación. Desde esta perspectiva, se puede afirmar que la autoevaluación en las instituciones educativas tiene como propósito fundamental",
+        ops:{A:"certificar la calidad de la gestión administrativa.",
+             B:"mejorar la capacidad de aprendizaje de los estudiantes.",
+             C:"fortalecer las capacidades de mejoramiento continuo.",
+             D:"identificar las debilidades y carencias."}},
+      {n:6, comp:"imp", dif:"baja", correcta:"D",
+        enun:"Cuando se afirma que la evaluación es de naturaleza social, se está haciendo referencia a que es",
+        ops:{A:"un acto individual propio de la autonomía del profesor.",
+             B:"una plataforma de debate entre evaluados y evaluadores.",
+             C:"una práctica que conduce a la competitividad.",
+             D:"una práctica participativa de toda la institución educativa."},
+        expl:{correcta:"Señala la naturaleza social de la evaluación. Lo anterior implica una práctica participativa para cada estamento dentro de la comunidad educativa.",
+              invalidas:{A:"No es válida porque la evaluación entendida desde su naturaleza social no puede ser un acto individual, donde el profesor apela a su autonomía únicamente.",
+                         B:"No es válida porque, aunque la evaluación implica el debate y la argumentación entre evaluadores y evaluados, al entenderse desde su naturaleza social se consideran otras prácticas evaluativas en el contexto escolar.",
+                         C:"No es válida porque la evaluación no se centra en la competitividad. Más allá de esto, busca desarrollar procesos de autorregulación en los estudiantes y, desde una perspectiva social, favorece el trabajo colaborativo."}}},
+      {n:7, comp:"imp", dif:null, correcta:"B",
+        enun:"Los resultados de las pruebas Saber en el área de Matemáticas muestran niveles bajos en un municipio. Los directivos de las instituciones educativas y las autoridades municipales, preocupados con estos resultados, se reúnen para poner en marcha una acción que eleve los resultados en la siguiente convocatoria. Las acciones más indicadas para obtener mejores resultados son:",
+        ops:{A:"Implementar proyectos de capacitación para los profesores en el diseño, aplicación y validación de pruebas.",
+             B:"Generar condiciones de posibilidad para el trabajo en colectivo de los profesores, a fin de revisar el proyecto del área y acordar su implementación.",
+             C:"Entrenar a los estudiantes para controlar los tiempos y conocer las indicaciones de respuesta de una prueba por competencias.",
+             D:"Comprometer a los padres de familia en el acompañamiento académico y en el control de la asistencia a los cursos contratados."}},
+      {n:8, comp:"aut", dif:null, correcta:"D",
+        enun:"Para evidenciar que la motivación hacia la participación fortalece la autorregulación de los estudiantes, en la organización de la celebración de una actividad institucional, un profesor deberá",
+        ops:{A:"preguntar quién quiere participar en la actividad.",
+             B:"escoger a los estudiantes de mejor rendimiento.",
+             C:"proponer el cronograma general de la actividad.",
+             D:"escuchar las expectativas de los estudiantes."}},
+      {n:9, comp:"aut", dif:null, correcta:"B",
+        enun:"En la educación, el logro de la autonomía de los estudiantes es un objetivo que les permite darse normas propias y llegar a ser socialmente responsables. Una institución educativa interesada en la formación en valores y actitudes autónomas hacia los deberes de los estudiantes decide implementar un modelo para el desarrollo de la autonomía. En la ejecución de este modelo, un profesor que quiera desarrollar la autonomía en sus estudiantes y mejorar sus aprendizajes deberá:",
+        ops:{A:"Diagnosticar ideas previas, diseñar un plan de trabajo, contextualizar los contenidos de la disciplina que enseña e identificar a los estudiantes que obtienen mejores resultados en sus exámenes.",
+             B:"Conformar y liderar una mesa redonda que cuente con la participación de todos los estudiantes, a fin de construir en colectivo los criterios con los cuales ellos serán evaluados.",
+             C:"Conocer la opinión de los estudiantes acerca del ambiente de la clase, diseñar un plan de actividades, motivar a los estudiantes y asignar tareas extras a quienes no han aprobado.",
+             D:"Dialogar con los padres de familia para conocer las acciones que siguen para verificar que sus hijos realizan las tareas asignadas y para recomendarles estrategias que pueden implementar."}},
+      {n:10, comp:"aut", dif:null, correcta:"A",
+        enun:"Una actividad que un profesor puede implementar en sus clases para desarrollar la autonomía de los estudiantes es",
+        ops:{A:"discusión de alternativas propuestas acerca de cómo evaluar el tema de la clase.",
+             B:"generación de comentarios a la transcripción de un documental que se ha trasmitido en televisión.",
+             C:"elección de monitores de clase para que evalúen las tareas de los demás estudiantes.",
+             D:"elaboración de encuestas acerca de la opinión de los estudiantes sobre la evaluación."}},
+      {n:11, comp:"imp", dif:"media", correcta:"C",
+        enun:"Un profesor de Lengua Castellana decide cambiar el modelo de evaluación sumativa por un modelo de evaluación formativa, debido a que este le permite tomar en cuenta la diversidad de modos y ritmos de aprendizaje de sus estudiantes y mejorar los procesos de enseñanza y aprendizaje en su área. Al optar por un modelo de evaluación formativa, el profesor diseña pruebas que le permitan",
+        ops:{A:"obtener resultados confiables para aplicar las pruebas a todos los estudiantes de un grado.",
+             B:"realizar un examen objetivo al finalizar el año lectivo para certificar quiénes necesitan refuerzo.",
+             C:"valorar los progresos de sus estudiantes en comparación con su propio proceso de aprendizaje.",
+             D:"comparar los resultados de sus estudiantes para corroborar el nivel de logro de los objetivos."},
+        expl:{correcta:"Valorar el proceso de aprendizaje de los estudiantes, así como su progreso alcanzado, es parte fundamental de la evaluación formativa. La evaluación es un proceso particular para cada estudiante.",
+              invalidas:{A:"No es válida porque la evaluación formativa no busca estandarizar la forma de evaluar, tampoco pretende la consecución de resultados confiables.",
+                         B:"No es válida porque la evaluación formativa se da a lo largo del proceso de enseñanza y aprendizaje, no únicamente al final del año.",
+                         D:"No es válida porque la evaluación formativa busca el progreso en los aprendizajes de todos los estudiantes de manera continua, y no se centra en la comparación de los resultados."}}},
+      {n:12, comp:"aut", dif:null, correcta:"D",
+        enun:"Un profesor quiere fortalecer los valores ciudadanos de sus estudiantes y decide seguir el foro como técnica de trabajo. Esta técnica la implementa porque está interesado en fomentar en sus estudiantes la",
+        ops:{A:"autoestima.", B:"autonomía.", C:"regulación.", D:"participación."}},
+      {n:13, comp:"imp", dif:null, correcta:"B",
+        enun:"Teniendo en cuenta que los límites entre las disciplinas cada vez son más tenues, las competencias transversales están adquiriendo mayor presencia y valor en los procesos de formación integral. El modelo holístico o relacional lo seleccionan cada vez más los profesores para el trabajo por competencias. Desde esta perspectiva, la propuesta de evaluación más coherente con este enfoque es",
+        ops:{A:"la evaluación sumativa, porque da cuenta de los resultados.",
+             B:"la coevaluación, porque permite la evaluación recíproca.",
+             C:"la evaluación de expertos, porque elimina la subjetividad.",
+             D:"la evaluación censal, porque permite establecer comparaciones."}},
+      {n:14, comp:"aut", dif:null, correcta:"C",
+        enun:"Una de las utilidades que tienen los resultados de las evaluaciones institucionales, que adelantan periódicamente las instituciones educativas, es la reformulación de planes estratégicos para",
+        ops:{A:"el crecimiento en el número de estudiantes inscritos.",
+             B:"el mejoramiento del ambiente laboral de los profesores.",
+             C:"el mejoramiento de la calidad de los servicios educativos.",
+             D:"la disminución de llamados de atención a estudiantes."}},
+      {n:15, comp:"alt", dif:"alta", correcta:"C",
+        enun:"Un grupo de estudiantes de décimo grado le expresa al coordinador de grupo su inconformidad con uno de sus profesores, que si bien reconocen como juicioso, responsable y estudioso, indican que su forma de enseñar es demasiado aburrida (llama a lista, escribe la fecha, explica un tema del libro, organiza talleres y asigna ejercicios para la casa). El tipo de evaluación que realiza el profesor corresponde con una perspectiva tradicional. De las estrategias mencionadas a continuación, la que le permite al profesor implementar formas alternativas es:",
+        ops:{A:"Organizadores gráficos, salidas al tablero y heurística.",
+             B:"Talleres, exámenes diarios y dictados.",
+             C:"Portafolios, diarios pedagógicos y trabajo en pequeños grupos.",
+             D:"Cuestionarios, calificación del cuaderno y mapas de ideas."},
+        expl:{correcta:"Evidencia pertinencia en cuanto a que el profesor debe conocer e implementar formas de evaluación alternativas que busquen superar la metodología tradicional. El portafolio permite llevar las evidencias de logros y desempeños, los diarios pedagógicos permiten registrar los aprendizajes de los estudiantes y el trabajo en pequeños grupos favorece el trabajo colaborativo y el intercambio de saberes.",
+              invalidas:{A:"Involucra algún tipo de evaluación tradicional (salidas al tablero), por lo que no se puede considerar en su conjunto como práctica evaluativa alternativa.",
+                         B:"Talleres, exámenes diarios y dictados son evaluación tradicional.",
+                         D:"Cuestionarios, calificación del cuaderno y mapas de ideas también involucran evaluación tradicional."}}},
+      {n:16, comp:"imp", dif:null, correcta:"A",
+        enun:"Los profesores de una institución educativa acuerdan presentar al Consejo Directivo una propuesta que favorezca la formación ciudadana. Los contenidos de la propuesta para favorecer la formación ciudadana son:",
+        ops:{A:"Intervenir los conflictos, revisar las prácticas de evaluación de los aprendizajes y construir proyectos que relacionen los contenidos con los contextos.",
+             B:"Involucrar a los padres de familia, construir un sistema de seguimiento a los indicadores de logro y revisar el proyecto pedagógico institucional.",
+             C:"Invitar expertos en resolución de conflictos, consolidar un sistema de información e incrementar las horas del proyecto para la justicia y la paz.",
+             D:"Conformar una junta para la evaluación de desempeño docente, realizar un reinado de valores y auspiciar diálogos entre las directivas y los estudiantes."}},
+      {n:17, comp:"alt", dif:null, correcta:"A",
+        enun:"Las instituciones educativas tienen el reto de convertirse en focos culturales de sus entornos sociales para dar cuenta del desarrollo de la gestión a la comunidad. La acción que engloba el reto mencionado para evaluar esta gestión es",
+        ops:{A:"considerar la relación escuela/sociedad.",
+             B:"identificar la relación egresados/emprendimiento.",
+             C:"evidenciar la relación padres de familia/contexto.",
+             D:"confirmar la relación sectores productivos/convenios."}},
+      {n:18, comp:"aut", dif:null, correcta:"C",
+        enun:"Una profesora identifica que, en su clase, los estudiantes manifiestan una alta predisposición por el trabajo individual. Para revertir esta situación, la profesora implementa prácticas evaluativas variadas. La mejor alternativa de práctica evaluativa que permite evidenciar el grado de interacción entre los estudiantes es",
+        ops:{A:"el test de concepciones alternativas.",
+             B:"la exposición de la historia de un concepto.",
+             C:"el debate sobre una polémica científica.",
+             D:"la elaboración de antecedentes de un tema."}},
+      {n:19, comp:"imp", dif:null, correcta:"A",
+        enun:"El sistema educativo colombiano está descentralizado y, por tanto, sus instituciones educativas son autónomas. La participación de las comunidades en el gobierno escolar ha generado nuevos modos de gestión educativa, en los cuales la evaluación desempeña un papel fundamental para",
+        ops:{A:"orientar la toma de decisiones.",
+             B:"establecer prioridades políticas.",
+             C:"controlar el ritmo del cambio.",
+             D:"incentivar a los profesores."}},
+      {n:20, comp:"alt", dif:null, correcta:"C",
+        enun:"Las comisiones de evaluación y promoción en las instituciones educativas hacen seguimiento a los resultados obtenidos por los estudiantes en las evaluaciones de cada periodo académico y sugieren estrategias pedagógicas para apoyar a quienes presentan debilidades. Esta práctica sistemática tiene razón de ser, si se toma en cuenta que uno de los propósitos de la evaluación institucional de los estudiantes es",
+        ops:{A:"identificar modelos pedagógicos.",
+             B:"medir la apropiación de competencias.",
+             C:"analizar la información para tomar decisiones.",
+             D:"determinar el porcentaje de reprobación."}},
+      {n:21, comp:"imp", dif:null, correcta:"D",
+        enun:"En repetidas ocasiones, se percibe que la relación entre profesores y padres de familia es escasa y que además los encuentros se entienden como una sucesión de quejas acerca de los estudiantes. La evaluación, con una perspectiva contemporánea, implica tener en cuenta todas las dimensiones del estudiante para implementar una evaluación formativa. Así, para establecer ese vínculo el profesor puede",
+        ops:{A:"convocar a reuniones grupales cuando se requiera la intervención y el acompañamiento del núcleo familiar en el actuar de los estudiantes.",
+             B:"anotar en la agenda de los estudiantes sus logros, fortalezas y debilidades cognitivas y hacer recomendaciones para mejorar.",
+             C:"emitir citaciones individuales a padres de familia en la institución cuando se afecte la convivencia y bienestar de los estudiantes.",
+             D:"diseñar un blog con acceso a estudiantes, profesor y padres de familia donde se publique el progreso cualitativo de los estudiantes."}},
+      {n:22, comp:"imp", dif:null, correcta:"A",
+        enun:"En el marco del sistema de evaluación que propone el Decreto 1290 de 2009, una institución educativa somete a análisis las características de la evaluación tradicional versus la evaluación auténtica. Un grupo de profesores decide implementar estrategias de evaluación auténticas con el fin de comprometer cada vez más a sus estudiantes con su proceso de aprendizaje. De acuerdo con lo anterior, la actividad de evaluación más pertinente es",
+        ops:{A:"la toma de decisiones para resolver un problema de la comunidad que implique el uso de distintos conocimientos.",
+             B:"la aplicación de un examen oral sobre una situación problemática propuesta por los temas del área.",
+             C:"la construcción de un artefacto de utilidad según la temática desarrollada en las sesiones de clase.",
+             D:"la puesta en escena de un problema del área que haga explícitos los conocimientos aprendidos."}},
+      {n:23, comp:"aut", dif:null, correcta:"A",
+        enun:"Un profesor desarrolla un proyecto llamado Comunicación asertiva. El objetivo consiste en generar habilidades de comunicación que permitan mediar y resolver conflictos en las relaciones interpersonales. Los indicadores de aprendizaje se definirán a través de una estrategia que reconoce la participación colectiva de los estudiantes. El procedimiento adecuado es el diálogo",
+        ops:{A:"consensuado, el cual fomenta el acuerdo entre los intereses formativos establecidos por el profesor y los estudiantes como desarrolladores de la actividad.",
+             B:"crítico, el cual permite llegar al fondo conceptual del tema a través del intercambio de ideas que se aproximan a la unificación de un criterio específico.",
+             C:"reflexivo, el cual reconoce la opinión de los estudiantes al cuestionar el aprendizaje y permite analizar los aspectos relevantes del proceso académico.",
+             D:"directo, el cual intercambia las ideas de forma presencial y posibilita la argumentación acerca de los contenidos de la temática expuesta."}},
+      {n:24, comp:"aut", dif:null, correcta:"A",
+        enun:"Las instituciones educativas enfrentan problemáticas relacionadas con el abandono escolar como resultado del bajo rendimiento académico de sus estudiantes. Dentro de las acciones por desarrollar deciden realizar una reforma curricular que incida en el proceso de enseñanza y aprendizaje, sustentada, entre otras, en la siguiente acción:",
+        ops:{A:"Concebir el proceso evaluativo como el resultado de una acción investigativa.",
+             B:"Elaborar un plan de acción que trace lineamientos curriculares y pedagógicos.",
+             C:"Crear un banco de preguntas, que evalúen las diferentes áreas del conocimiento.",
+             D:"Capacitar a los profesores sobre las nuevas estrategias y técnicas de evaluación."}}
+    ]
+  },
+
+  ensenar: {
+    titulo: "Enseñar",
+    subtitulo: "Diseño, didáctica y desarrollo de la enseñanza en el aula",
+    preguntas: [
+      {n:1, comp:"dis", dif:null, correcta:"B",
+        enun:"El profesor de Sociales se queja ante el coordinador académico porque dos de sus estudiantes nunca escuchan instrucciones y son los que más generan desorden. El coordinador conoce la trayectoria conflictiva de los estudiantes, así como su alto desempeño académico. Para atender esta situación, el coordinador académico le sugiere al profesor como estrategia",
+        ops:{A:"buscar a los estudiantes en los recreos y volverse su amigo, porque la investigación educativa ha mostrado una correlación positiva entre la camaradería y la disciplina en el salón.",
+             B:"observar los desempeños y comportamientos de los estudiantes para diseñar actividades de clase acordes con los objetivos y apropiadas para sus estilos de aprendizaje.",
+             C:"citar a los padres semanalmente si es necesario, para que les recuerden a sus hijos las pautas sobre la disciplina y el comportamiento apropiados para la institución.",
+             D:"prohibir a los estudiantes que se sienten cerca, porque el problema radica en que son una influencia negativa el uno para el otro."}},
+      {n:2, comp:"act", dif:null, correcta:"A",
+        enun:"Un profesor selecciona una actividad con el fin de favorecer la participación de los estudiantes en su clase. Para llevar a cabo este objetivo, la actividad seleccionada por el profesor debe ser",
+        ops:{A:"interesante, para que el estudiante se reconozca como protagonista de su propio aprendizaje.",
+             B:"creativa, para que los estudiantes atiendan la explicación del profesor durante el desarrollo de la clase.",
+             C:"motivante, para incorporar todos los temas elegidos y para calificarlos según lo planificado.",
+             D:"divertida, para que el estudiante considere que aprender es fácil y pueda aprobar los exámenes."}},
+      {n:3, comp:"act", dif:null, correcta:"B",
+        enun:"Las habilidades cognitivas forman parte de las habilidades de pensamiento que deben desarrollar los estudiantes en su proceso de aprendizaje. Un profesor encontró que, luego de incorporar los desarrollos cognitivos de sus estudiantes en las actividades de enseñanza, ellos disponían y usaban más estas habilidades, y mejoraban así el desempeño en su clase. Para ello, incorpora en la clase actividades relacionadas con",
+        ops:{A:"contenidos procedimentales, para usar métodos de elaboración de saberes.",
+             B:"situaciones de contexto, para favorecer la relación de un saber con otros saberes.",
+             C:"contenidos actitudinales, para asimilar temas fundamentales de un saber.",
+             D:"situaciones inusuales, para motivar a los estudiantes a aprender un saber."}},
+      {n:4, comp:"dis", dif:null, correcta:"C",
+        enun:"Según el propósito del currículo, la institución educativa considera que el papel del profesorado es relevante y, para ello, ha estimulado la integración de un equipo de profesores que orienten sus procedimientos y señalen unas pautas a seguir. El equipo conformado debe tener en cuenta los siguientes componentes:",
+        ops:{A:"La evaluación de la organización curricular de contenidos procedimentales y los resultados de los estudiantes en pruebas censales.",
+             B:"La fundamentación de los modelos pedagógicos y didácticos empleados y su aplicación en el desarrollo de competencias, habilidades y capacidades.",
+             C:"La fundamentación de los modelos pedagógicos y didácticos empleados y su aplicación en el desarrollo de contenidos conceptuales, procedimentales y actitudinales.",
+             D:"La evaluación de la organización curricular de contenidos conceptuales y los resultados de los estudiantes en pruebas censales."}},
+      {n:5, comp:"act", dif:null, correcta:"C",
+        enun:"En el segundo período del año escolar, un profesor percibe que un porcentaje alto de estudiantes presenta problemas de construcción conceptual en su área y baja participación en clase. Al indagar, encuentra que la mayor dificultad para comprender la materia se debe a la forma como están organizados los conceptos. Decide entonces cambiar su estrategia didáctica y relacionar más los contenidos curriculares con la vida cotidiana de los estudiantes. La implementación de esta nueva estrategia requiere un proceso educativo con énfasis en",
+        ops:{A:"la definición de reglas claras para las intervenciones en clase y el control de la disciplina.",
+             B:"la adopción de estímulos para quienes más participen y demuestren mayor interés en la clase.",
+             C:"la flexibilización del plan de estudios y el estímulo a la disposición para interactuar con otros.",
+             D:"la incorporación de lecturas sobre la participación y la comprobación de su comprensión."}},
+      {n:6, comp:"act", dif:null, correcta:"B",
+        enun:"En una institución educativa, los profesores de sexto grado consideran importante inculcar el sentido de la responsabilidad en los estudiantes y notan con preocupación que ellos no están cumpliendo con las tareas escolares asignadas. Al preguntarles su opinión, los estudiantes consideran que, para cumplir con las tareas, se deben suspender las actividades extracurriculares obligatorias de la jornada complementaria. Para reforzar el sentido de responsabilidad en los estudiantes, los profesores proponen",
+        ops:{A:"exponer ante los padres de familia las ventajas de exigir a sus hijos el cumplimiento de las tareas escolares.",
+             B:"considerar los compromisos que asumen los estudiantes en las dos jornadas para la asignación de tareas.",
+             C:"premiar a los estudiantes que, además de participar en ambas jornadas, cumplen con las tareas académicas.",
+             D:"privilegiar las tareas académicas que estimulen el intelecto, porque las demás actividades son recreativas."}},
+      {n:7, comp:"did", dif:null, correcta:"B",
+        enun:"El plan de estudios de una institución educativa se desarrolla con prácticas pedagógicas que promuevan interdisciplinariedad, que relacionen contenidos de diferentes áreas, con el fin de que los profesores, en sus clases, hagan explícitas las condiciones socio-históricas de la producción de las disciplinas. Para favorecer la interdisciplinariedad, un profesor procura que sus estudiantes sean capaces de",
+        ops:{A:"aprender los saberes propios de cada área escolar.",
+             B:"articular problemas de distintos campos del saber.",
+             C:"identificar los objetos de conocimiento de la ciencia.",
+             D:"integrar temas trabajados en distintos grados escolares."}},
+      {n:8, comp:"dis", dif:null, correcta:"B",
+        enun:"Un estilo de aprendizaje puede definirse como un conjunto de estrategias de las que el estudiante hace uso para lograr aprender; estas estrategias varían en relación con lo que se quiere aprender, pero, aun así, cada estudiante presenta una tendencia por utilizar más unas que otras. Conocer los estilos de aprendizaje de los estudiantes forma parte de las competencias docentes, pues ello le permite al profesor",
+        ops:{A:"prever que los estudiantes aprendan un número adecuado de contenidos de la clase de acuerdo con los objetivos propuestos.",
+             B:"seleccionar actividades para desarrollar en las clases y estimular el aprendizaje de teorías, conceptos, predisposiciones y prácticas.",
+             C:"brindar una mejor asesoría a los padres de familia acerca de cómo fomentar en sus hijos habilidades para la realización de tareas.",
+             D:"dar solución a los bajos resultados académicos de los estudiantes demostrando que todos deben aprender y al mismo ritmo."}},
+      {n:9, comp:"act", dif:null, correcta:"C",
+        enun:"Un grupo de profesores retoma los resultados del proceso de autoevaluación institucional realizado hace cuatro años, referidos al desafío de repensar la relación sociedad/escuela y refundar la escuela para que aporte alternativas. Revisar este propósito permitió reconocer que no se ha avanzado significativamente. En cada área, los profesores se proponen promover en los estudiantes actitudes críticas, razonando deductivamente alrededor del ejercicio ciudadano. Para ello, en sus clases deben planear el desarrollo de habilidades cognitivas",
+        ops:{A:"creativas.", B:"verbales.", C:"analíticas.", D:"organizativas."}},
+      {n:10, comp:"act", dif:null, correcta:"B",
+        enun:"La planeación de una unidad temática que integre actividades de diversas áreas como las ciencias sociales, las artes, el lenguaje y las matemáticas requiere un proceso previo de reflexión. La pregunta inicial que usted como profesor se formula para llevar a cabo este proceso es:",
+        ops:{A:"¿Cuánto tiempo debo dedicarle a cada área?",
+             B:"¿Qué objetivos debo incluir en la unidad?",
+             C:"¿Qué materiales voy a escoger para motivar a los estudiantes?",
+             D:"¿Cómo voy a evaluar el desempeño de los estudiantes?"}},
+      {n:11, comp:"dis", dif:null, correcta:"A",
+        enun:"La descripción es una habilidad cognitivo-lingüística que se estimula con la mayoría de actividades que un estudiante desarrolla en su proceso de aprendizaje. Un profesor considera que esta habilidad se puede estimular haciendo uso del contexto cultural de los estudiantes y para ello realiza una caracterización de este. De acuerdo con lo anterior, se puede afirmar que el propósito del profesor es",
+        ops:{A:"facilitar el vínculo entre los contenidos de aprendizaje de la disciplina que enseña con las características del entorno, a fin de desarrollar habilidades descriptivas en los estudiantes.",
+             B:"identificar a los estudiantes que tienen más posibilidades de lograr buenos resultados académicos, para desarrollar en ellos habilidades descriptivas de las características del entorno.",
+             C:"explicar, con base en las características del entorno, las razones por las cuales solo unos pocos estudiantes aprueban la asignatura, con el fin de modificar los instrumentos de evaluación.",
+             D:"elaborar un plan de trabajo que mejore la infraestructura de la institución educativa, a fin de cambiar el entorno de los estudiantes y favorecer mejores resultados en el aprendizaje."}},
+      {n:12, comp:"act", dif:"baja", correcta:"A",
+        enun:"Un grupo de estudiantes de décimo grado le expresa al coordinador de grupo su inconformidad con uno de sus profesores, de quien, si bien reconocen como juicioso, responsable y estudioso, afirman que su modo de enseñar es demasiado aburrido (llama a lista, escribe la fecha, explica un tema del libro, organiza talleres y asigna ejercicios para la casa). El coordinador propone a su colega implementar otras estrategias de enseñanza que integren a los estudiantes en situaciones auténticas y desarrollen habilidades cognitivas. Una estrategia que se ajusta a esta intención es proponer:",
+        ops:{A:"la identificación de problemáticas del contexto cercano de los estudiantes que involucren múltiples alternativas de explicación.",
+             B:"una consulta de temas con base en una guía preestablecida por el profesor, en la cual los estudiantes responden a partir de un texto asignado.",
+             C:"una serie de actividades espontáneas desarrolladas por los estudiantes con independencia de la planificación, con el propósito de centrar su atención.",
+             D:"la asignación de exposiciones, consultas y dinámicas que motiven a los estudiantes a realizar actividades más participativas."},
+        expl:{correcta:"La respuesta A comprende situaciones auténticas para la enseñanza, como las problemáticas del contexto cercano a los estudiantes. El hecho de que involucren múltiples alternativas de explicación implica el desarrollo de habilidades cognitivas en los estudiantes.",
+              invalidas:{B:"Implica una estrategia de enseñanza tradicional que no plantea ningún tipo de situación auténtica.",
+                         C:"Propone actividades independientes de la planificación; aunque pueden centrar la atención, no son pertinentes si se pretende que el profesor tenga en cuenta los desarrollos cognitivos de los estudiantes, lo cual exige planificación.",
+                         D:"Plantea exposiciones, consultas y dinámicas que, aunque pueden motivar, no responden a la sugerencia de integrar situaciones auténticas para el desarrollo de habilidades cognitivas."}}},
+      {n:13, comp:"act", dif:null, correcta:"C",
+        enun:"La formación por competencias requiere conocimientos, procedimientos, actitudes y disposiciones que deben estar relacionados entre sí para propiciar un aprendizaje retador y con sentido. En el caso de las competencias transversales, estas pueden evaluarse con",
+        ops:{A:"un examen de comprensión de conceptos.",
+             B:"una exposición con el uso de las TIC.",
+             C:"una simulación de un problema.",
+             D:"una encuesta con preguntas cerradas."}},
+      {n:14, comp:"act", dif:"media", correcta:"B",
+        enun:"Según Bruner (1961), la mejor manera de generar interés en un tema es mostrarlo a los estudiantes como algo que vale la pena saber, y esto significa hacer que ese conocimiento sea útil en situaciones distintas a las que se han usado para aprenderlo. De acuerdo con lo anterior, las mejores actividades para enseñar un nuevo concepto, que promueva la motivación de los estudiantes, son:",
+        ops:{A:"Una exposición del concepto y de su importancia por parte del profesor y una investigación escrita sobre posibles aplicaciones del nuevo concepto.",
+             B:"Un ejercicio de aplicación seguido por la resolución de un problema de la vida real de elección libre que utiliza el nuevo concepto.",
+             C:"Una investigación sobre la importancia del tema, construida a partir de una pregunta orientadora, y un mapa conceptual de las aplicaciones del nuevo concepto en la vida real.",
+             D:"El diseño de un video sobre el nuevo concepto para mostrar su importancia y su publicación en el blog de la asignatura."},
+        expl:{correcta:"La respuesta B es la más pertinente, puesto que, como lo plantea Bruner, implica que los estudiantes sean capaces de resolver problemas por sí mismos, lo cual corresponde al aprendizaje por descubrimiento.",
+              invalidas:{A:"Incluye la importancia del tema y posibles aplicaciones, pero no implica la resolución de problemas por parte del estudiante.",
+                         C:"Evidencia posibles aplicaciones, pero tampoco implica resolución de problemas por el estudiante mismo.",
+                         D:"Genera interés en los estudiantes, pero no implica la resolución de problemas."}}},
+      {n:15, comp:"act", dif:null, correcta:"D",
+        enun:"En clase de Sociales, los estudiantes están aprendiendo sobre las formas de participación ciudadana en el país. La actividad más pertinente para que los estudiantes apropien estos conceptos es",
+        ops:{A:"leer las diferentes formas de participación ciudadana que existen en el libro de texto, en internet, y en revistas.",
+             B:"ver ejemplos de participación ciudadana en el siglo XX en diferentes países del mundo.",
+             C:"estudiar la Constitución y aprender las diferentes maneras de participación ciudadana que existen.",
+             D:"plantear un dilema en el cual los estudiantes proponen estrategias de participación ciudadana."}},
+      {n:16, comp:"act", dif:null, correcta:"A",
+        enun:"Un profesor está interesado en conocer y orientar las dudas de los estudiantes de uno de los temas de su clase. Decide realizar una actividad de dos horas y tres fases (\"¡Mis inquietudes!\"). En la primera fase, mediante marcadores (uno por estudiante) y cartulinas (tres por estudiante), el profesor busca que ellos expongan sus inquietudes. Las instrucciones que el profesor debe comunicarles para la realización adecuada de la actividad individual, en su fase uno, son:",
+        ops:{A:"Revisar apuntes de clase, identificar aquellos puntos que aún no comprenden, reflexionar para formularlos en forma de pregunta, escribir una pregunta en cada cartulina y entregar al profesor.",
+             B:"Identificar cuáles son los materiales de trabajo, verificar que estos estén completos (en caso de no estarlo, informar al profesor), escribir tres preguntas de interés, revisar la redacción y entregar al profesor.",
+             C:"Escribir una pregunta en cada cartulina, comparar sus preguntas con las de otros estudiantes, modificar las preguntas que sean muy simples, reformular las preguntas y entregar al profesor.",
+             D:"Emplear sus conocimientos para formular preguntas novedosas, escoger las tres preguntas más difíciles, escribir las tres preguntas en las cartulinas, revisar la redacción y entregar al profesor."}},
+      {n:17, comp:"did", dif:null, correcta:"C",
+        enun:"En el proceso de planeación del año escolar, un profesor de Sociales prepara una secuencia de enseñanza para grado noveno llamada \"Transformaciones sobre el territorio natural colombiano\", de manera que los estudiantes den cuenta de los esfuerzos de cada generación por dominar, explotar o disfrutar su territorio desde tiempos remotos hasta la actualidad, generando un documento audiovisual y escrito como producto de su indagación. Por tanto, la planeación de la unidad didáctica debe basarse en un enfoque",
+        ops:{A:"tecnológico, marcado por el pensamiento creativo para estimular la curiosidad científica útil para resolver problemas y tomar decisiones sobre la realidad local.",
+             B:"empírico-analítico, marcado por el pensamiento sensorial e inductivo para describir, explicar y predecir sucesos mediante deducciones no contradictorias.",
+             C:"socio-cultural, marcado por el pensamiento reflexivo para comprender y estudiar los fenómenos de las interacciones del individuo en un momento histórico dado.",
+             D:"subjetivo, marcado por el pensamiento introspectivo, del mundo interior, para almacenar, recuperar y utilizar la información recibida a través de los sentidos."}},
+      {n:18, comp:"dis", dif:"alta", correcta:"D",
+        enun:"La concepción del mundo wayuu se fundamenta en la espiritualidad y el pensamiento propio mediados por la oralidad, el ejemplo, la imitación, la observación directa, la convivencia y las experiencias vividas. En la nación wayuu, el saber es transmitido de manera oral y práctica mediada por la participación del individuo en la producción cultural. Según este contexto, los objetivos de formación en los primeros grados de un proyecto etnoeducativo desarrollado en una institución educativa de La Guajira deben orientarse a",
+        ops:{A:"fomentar procesos de comunicación que les permitan a los estudiantes compartir y enriquecer los conocimientos de su comunidad con los de otras culturas.",
+             B:"promover el intercambio de experiencias con otras culturas, donde se realice la asimilación de costumbres adaptándolas a su propia identidad.",
+             C:"fortalecer los procesos de escritura, de manera que inicie sus procesos de adquisición de una segunda lengua que faciliten la interacción con otras culturas.",
+             D:"favorecer, a partir de la palabra hablada y la interacción entre estudiantes, procesos de construcción de conocimiento que propendan al fortalecimiento de la identidad cultural."},
+        expl:{correcta:"La respuesta D es la más adecuada, ya que considera el fortalecimiento de la identidad cultural, principio fundamental en todo proyecto etnoeducativo.",
+              invalidas:{A:"Plantea el intercambio cultural, que hace parte de la interculturalidad, pero no es uno de los principios más relevantes del sistema educativo propio wayuu.",
+                         B:"Aborda la asimilación de costumbres, lo que se aleja de los modelos educativos propios de las comunidades indígenas.",
+                         C:"Implica aspectos relacionados con la etnoeducación, pero no pone el énfasis en los principios que orientan la educación wayuu."}}},
+      {n:19, comp:"dis", dif:null, correcta:"D",
+        enun:"El aprendizaje se promueve por medio de interacciones, reformulaciones y transformaciones continuas. Las ideas previas están presentes durante todo ese proceso; por ello, las actividades en clase deben permitir que los estudiantes revelen lo que ya saben o creen saber, no como mera información para el profesor sino para hacer uso provechoso de ello, buscando la forma de enriquecerla, completarla, cuestionarla, complejizarla y relacionarla con los nuevos conocimientos. Esta perspectiva de enseñanza y aprendizaje le permite al profesor",
+        ops:{A:"la comprensión de los aciertos y errores de los estudiantes frente a un tema.",
+             B:"el análisis de las contradicciones y confusiones que surjan durante el proceso.",
+             C:"la orientación a los estudiantes en la adquisición de nuevos conocimientos.",
+             D:"el reconocimiento de ideas y percepciones preliminares de los estudiantes."}},
+      {n:20, comp:"did", dif:null, correcta:"A",
+        enun:"En general, un conocimiento disciplinar está constituido por todas aquellas leyes, teorías y conceptos que el profesor usa como referencia para organizar los contenidos que se deben enseñar y para diseñar el currículo del curso. En la formación de los estudiantes, el conocimiento disciplinar le permite al profesor",
+        ops:{A:"transformarlo para elaborar contenidos de aprendizaje.",
+             B:"usarlo para poner en práctica políticas educativas.",
+             C:"aprovecharlo para mejorar niveles de motivación en la clase.",
+             D:"tomarlo como referencia para asignar actividades extra clase."}},
+      {n:21, comp:"dis", dif:null, correcta:"B",
+        enun:"La descripción es una habilidad cognitivo-lingüística que se estimula con la mayoría de actividades que un estudiante desarrolla en su proceso de aprendizaje. Un profesor espera que sus estudiantes mejoren la manera como describen fenómenos propios de su contexto social e implementa en sus clases estrategias innovadoras para potenciar esta habilidad al tiempo que aprenden. Las estrategias que el profesor implemente deberán considerar:",
+        ops:{A:"El modelo económico del contexto de los estudiantes, el fomento de estilos cognitivistas de aprendizaje y el uso de modelos didácticos directivistas.",
+             B:"Los contenidos de enseñanza, el fomento de estilos de aprendizaje por resolución de problemas y las particularidades del entorno de la institución educativa.",
+             C:"El contexto de los estudiantes, el desarrollo de metodologías que garantizan buenas explicaciones del profesor y el uso de modelos didácticos constructivistas.",
+             D:"El currículo del curso, el uso de modelos didácticos para el aprendizaje por descubrimiento y las características del Proyecto Educativo Institucional."}},
+      {n:22, comp:"dis", dif:null, correcta:"B",
+        enun:"La caracterización preliminar de un grupo de estudiantes permite conocer información sobre rango de edad, nivel de sociabilidad, distribución porcentual por género, nivel cognitivo-lingüístico, nivel socioeconómico y persona(s) con quien(es) viven los estudiantes. De estas características, aquellas de mayor relevancia para un profesor a la hora de diseñar y aplicar una estrategia de enseñanza y aprendizaje son",
+        ops:{A:"nivel cognitivo-lingüístico y persona(s) con quien(es) viven los estudiantes.",
+             B:"rango de edad y nivel cognitivo-lingüístico.",
+             C:"distribución porcentual por género y persona(s) con quien(es) viven los estudiantes.",
+             D:"rango de edad y distribución porcentual por género."}},
+      {n:23, comp:"dis", dif:null, correcta:"A",
+        enun:"La labor docente apoyada en estrategias colaborativas entre profesores favorece los propósitos formativos de una institución educativa, pues la planeación curricular en equipo es una oportunidad para que los profesores",
+        ops:{A:"relacionen objetivos de enseñanza de diversas áreas de conocimiento.",
+             B:"propongan mejoras en los medios educativos requeridos para el aprendizaje.",
+             C:"sugieran evaluaciones acordes con las expectativas de una parte de los padres de familia.",
+             D:"mejoren la educación en valores democráticos que reciben los estudiantes."}},
+      {n:24, comp:"did", dif:null, correcta:"A",
+        enun:"Un equipo de profesores diseña sus unidades didácticas en un ámbito interdisciplinar como instrumento de apoyo en los diversos procesos de enseñanza-aprendizaje, de modo que promuevan la lectura y se fortalezcan las habilidades en la búsqueda, análisis y tratamiento de la información. Para dinamizar el desarrollo de la comprensión de lectura, en relación con transferir lo aprendido a otros contextos, los profesores deberían fundamentarse en el siguiente proceso:",
+        ops:{A:"Explicar los objetivos relacionados con el texto, ejemplificar la estrategia y describir la habilidad comunicativa propia de la actividad, orientar las preguntas de comprensión y garantizar el uso independiente con material nuevo.",
+             B:"Diseñar un programa de conocimientos basado en problemas de investigación, caracterizar las competencias del estudiante, establecer criterios, definir y desarrollar el proyecto y evaluar las competencias logradas.",
+             C:"Indagar los conocimientos previos para conectarlos con los nuevos contenidos, escuchar con atención los aportes de los estudiantes, buscar que retengan lo más significativo de las explicaciones y asignar trabajo extra.",
+             D:"Indicar las relaciones dadas en el contenido leído, sugerir técnicas para resolver problemas, verificar paso por paso la resolución de la situación planteada, analizar las soluciones obtenidas y explorar nuevos procedimientos."}},
+      {n:25, comp:"did", dif:null, correcta:"B",
+        enun:"En una institución educativa, los profesores de Sociales consideran importante implementar las tecnologías de la información y la comunicación (TIC) para mejorar la comprensión de conceptos de su disciplina y así favorecer los aprendizajes de los estudiantes. Por esto, además, deciden utilizar como recurso, en algunas de sus clases, la sala de informática. De acuerdo con lo anterior, la razón primordial de su utilización radica en que",
+        ops:{A:"las TIC despiertan el interés en los estudiantes y son motivadoras y atrayentes.",
+             B:"el profesor logra mayor interactividad que con otros medios y recursos didácticos.",
+             C:"las TIC aportan recursos de todo tipo que promueven las representaciones del entorno.",
+             D:"el profesor garantiza la búsqueda y el análisis de información sobre diversos temas."}},
+      {n:26, comp:"did", dif:null, correcta:"C",
+        enun:"Las instituciones educativas implementan diferentes métodos que cambian el concepto de enseñar. Originalmente, los estudiantes prestaban atención a las instrucciones impartidas por su profesor para seguirlas incuestionablemente. En el presente, la labor de los profesores es propiciar los ambientes óptimos para el descubrimiento, es decir, para que el estudiante encuentre su propio conocimiento. Esta forma de enseñar puede conducir al desarrollo del aprendizaje autónomo. Desde esa perspectiva, un estudiante demuestra autonomía en su aprendizaje cuando",
+        ops:{A:"propone objetivos, planifica actividades y aplica estrategias con el fin de lograr sus metas.",
+             B:"tiene conciencia sobre sí mismo, autoregula el conocimiento y valora sus procesos.",
+             C:"analiza su quehacer y se compromete a formar parte de un ciclo de mejoramiento.",
+             D:"evalúa su comportamiento, propende por su bienestar y establece parámetros de estudio."}}
+    ]
+  }
+};
+
+const GUIA_GENERAL = [
+  {t:"1 · Lee la situación, no el tema", focus:"situacion", d:"Cada pregunta parte de un episodio escolar concreto (un profesor, unos estudiantes, unas directivas, unos padres). Antes de mirar las opciones, identifica quién actúa y cuál es el problema o la decisión que está en juego."},
+  {t:"2 · Ubica la pregunta exacta", focus:"pregunta", d:"El enunciado casi siempre pregunta por el propósito, el criterio más pertinente o la acción más acertada frente a esa situación. No es lo mismo \"¿qué se busca lograr?\" que \"¿qué se debe hacer primero?\" — responde exactamente lo que se pregunta, no lo que te parezca más importante."},
+  {t:"3 · Descarta, no adivines", focus:"descarte", d:"De las 4 opciones, casi siempre 2 o 3 suenan pedagógicamente bien. Pregúntate de cada una: ¿el actor es el correcto (los estudiantes, el profesor, la comunidad)? ¿es una acción completa o solo un paso parcial? ¿llega en el momento adecuado según lo que pide el enunciado?"},
+  {t:"4 · Cuidado con los verbos", focus:"verbos", d:"\"Informar\" no es lo mismo que \"vincular\"; \"consultar\" no es lo mismo que \"construir con\"; \"recibir información\" no es lo mismo que \"participar en la decisión\". La opción correcta casi siempre usa el verbo que implica mayor protagonismo real de quien se pregunta (estudiantes, familias, comunidad), no el que solo transmite o controla."}
+];
+
+const EJEMPLO_GUIA = {
+  actor: "los profesores de noveno grado (y sus estudiantes)",
+  problema: "estimular en los estudiantes la elaboración de alternativas de solución a un problema comunitario",
+  situacion: "Al comenzar el año escolar, los profesores de noveno grado de una institución educativa deciden implementar una estrategia para estimular en los estudiantes la elaboración de alternativas de solución para problemas comunitarios; para ello, eligen uno relacionado con el sistema de acueducto y alcantarillado de su localidad.",
+  pregunta: "Con esta estrategia se busca que los estudiantes",
+  opciones: {
+    A:{texto:"indaguen con los expertos en el tema sobre las mejores alternativas de solución para este problema.", verbo:"indaguen (con expertos)", veredicto:"descarta", razon:"Actor equivocado: quienes proponen la solución son los expertos, no los estudiantes."},
+    B:{texto:"consulten textos en la biblioteca para identificar posibles causas del problema.", verbo:"consulten (textos)", veredicto:"descarta", razon:"Acción parcial: solo identifica causas, no llega a construir una solución."},
+    C:{texto:"construyan opciones viables a partir del análisis de las causas del problema.", verbo:"construyan (opciones)", veredicto:"correcta", razon:"Actor correcto (los estudiantes) + acción completa (analizar y construir, no solo identificar o consultar)."},
+    D:{texto:"divulguen entre la comunidad las soluciones que se han usado para resolver problemas similares.", verbo:"divulguen (soluciones)", veredicto:"descarta", razon:"Llega demasiado pronto: divulgar es un paso posterior a tener ya una solución construida."}
+  },
+  correcta:"C"
+};
+
+const CONCEPTOS = {
+  formar: {
+
+    resumen: "El módulo Formar evalúa tu capacidad de comprender a tus estudiantes como personas completas —no solo como aprendices— y de conectar tu labor docente con la institución, la familia y la comunidad. No busca que sepas teoría de memoria, sino que reconozcas cuál acción realmente forma ciudadanos y fortalece el tejido social alrededor de la escuela.",
+    claves: [
+      {comp:"fis", d:"Se trata de leer al estudiante completo: su momento de desarrollo, su contexto social, sus conflictos. Las respuestas correctas casi siempre eligen la opción que atiende a la causa humana de la situación en vez de la que solo controla el síntoma (castigar, prohibir, vigilar).",
+       ejemplo:{
+         situacion:"Un profesor de Sociales se queja porque dos estudiantes nunca escuchan instrucciones y generan desorden. El coordinador sabe que ambos tienen alto desempeño académico y una trayectoria conflictiva.",
+         pregunta:"El coordinador le sugiere al profesor como estrategia:",
+         opciones:{A:"Volverse su amigo en los recreos, apelando a la camaradería.",
+                    B:"Observar sus desempeños y comportamientos para diseñar actividades acordes con sus estilos de aprendizaje.",
+                    C:"Citar a los padres semanalmente para que recuerden las pautas de disciplina.",
+                    D:"Prohibir que se sienten cerca, porque son mala influencia entre sí."},
+         correcta:"B",
+         porque:"Porque parte de entender a los estudiantes (su forma de aprender, su comportamiento) antes de actuar, en vez de solo controlar la conducta desde afuera con premios, castigos o separación física."}},
+      {comp:"cul", d:"Pregunta si entiendes que aprender no ocurre aislado del entorno: el barrio, las tradiciones, el territorio, la comunidad. Las opciones correctas casi siempre conectan la clase con la realidad cultural y social de los estudiantes, y casi nunca se quedan en solo informar o consultar información.",
+       ejemplo:{
+         situacion:"Al comenzar el año, los profesores de noveno grado deciden estimular en los estudiantes la elaboración de alternativas de solución para problemas comunitarios, y eligen uno relacionado con el acueducto y alcantarillado de su localidad.",
+         pregunta:"Con esta estrategia se busca que los estudiantes:",
+         opciones:{A:"Indaguen con expertos sobre las mejores alternativas de solución.",
+                    B:"Consulten textos en la biblioteca para identificar posibles causas.",
+                    C:"Construyan opciones viables a partir del análisis de las causas del problema.",
+                    D:"Divulguen entre la comunidad soluciones ya usadas en problemas similares."},
+         correcta:"C",
+         porque:"Porque son los propios estudiantes quienes deben analizar su entorno cultural y social —el problema real de su localidad— y construir soluciones, no recibirlas de expertos ni limitarse a divulgar lo que ya existe."}},
+      {comp:"vin", d:"Evalúa si ves la escuela como un actor social, no solo como un lugar donde se dictan clases. Las respuestas correctas suelen hablar de compromiso recíproco, participación conjunta y construcción colectiva con familias y comunidad — nunca de que la escuela \"cumple\" y la familia solo \"recibe información\".",
+       ejemplo:{
+         situacion:"Después de la autoevaluación institucional, la comunidad educativa decide redefinir el vínculo entre escuela y familia, con un enfoque menos operativo y más holístico.",
+         pregunta:"Para el nuevo enfoque se requiere:",
+         opciones:{A:"El compromiso recíproco de escuela y familia, para tomar decisiones conjuntas a favor de los estudiantes.",
+                    B:"El intercambio de información entre escuela y familia sobre el rendimiento académico.",
+                    C:"Que la escuela responda por los conocimientos y la familia por los principios.",
+                    D:"El encuentro entre escuela y familia para cumplir la normatividad y los compromisos de matrícula."},
+         correcta:"A",
+         porque:"Porque un enfoque holístico exige que ambas partes decidan juntas, no que solo se repartan tareas (uno los conocimientos, otro los principios) ni que se limiten a cumplir trámites o intercambiar reportes."}},
+      {comp:"pro", d:"Se trata de tu propio crecimiento como docente: reflexionar sobre tu práctica, investigarla, mejorarla con el tiempo. Las respuestas correctas valoran el análisis y la comprensión de la realidad escolar, no la estandarización ni el control de resultados.",
+       ejemplo:{
+         situacion:"Un colegio afirma en su PEI que sus estudiantes son críticos, creativos y respetuosos de distintas perspectivas. Un grupo de profesores quiere investigar si eso realmente ocurre.",
+         pregunta:"La mejor metodología para llevar a cabo esta investigación es:",
+         opciones:{A:"Comparar resultados de Saber 11 con los de instituciones cercanas.",
+                    B:"Aplicar una prueba de pensamiento crítico y ver cuántos superan el promedio.",
+                    C:"Comparar resultados en Saber 11 y en una prueba de pensamiento crítico, buscando correlaciones.",
+                    D:"Aplicar una prueba de pensamiento crítico a noveno y once, y comparar los grados entre sí."},
+         correcta:"C",
+         porque:"Porque es la opción que investiga con más rigor la relación entre dos variables, en vez de quedarse en una sola medición aislada — eso es lo que distingue una indagación seria sobre la propia práctica de una simple comparación de cifras."}}
+    ]
+  },
+  evaluar: {
+    resumen: "El módulo Evaluar no pregunta cómo calificar un examen. Pregunta si entiendes la evaluación como una herramienta para mejorar el aprendizaje y la enseñanza — no como un instrumento de control, castigo o comparación entre estudiantes.",
+    claves: [
+      {comp:"alt", d:"Conocer alternativas significa saber que evaluar no es solo un examen escrito: portafolios, coevaluación, proyectos y diarios pedagógicos también son evaluación válida, y muchas veces más pertinente que la prueba tradicional.",
+       ejemplo:{
+         situacion:"Unos estudiantes de décimo se quejan de que su profesor, aunque juicioso y responsable, enseña de forma aburrida: llama a lista, explica un tema del libro, organiza un taller y asigna ejercicios para la casa. Su evaluación corresponde a una perspectiva tradicional.",
+         pregunta:"¿Qué estrategias le permitirían al profesor implementar formas alternativas?",
+         opciones:{A:"Organizadores gráficos, salidas al tablero y heurística.",
+                    B:"Talleres, exámenes diarios y dictados.",
+                    C:"Portafolios, diarios pedagógicos y trabajo en pequeños grupos.",
+                    D:"Cuestionarios, calificación del cuaderno y mapas de ideas."},
+         correcta:"C",
+         porque:"Porque es el único conjunto que rompe realmente con la evaluación tradicional (examen, tablero, cuaderno): el portafolio muestra evidencias de progreso, el diario pedagógico registra el aprendizaje y el trabajo en grupo favorece el intercambio de saberes."}},
+      {comp:"imp", d:"Se trata de ver la evaluación como parte de un ciclo de mejora: los resultados sirven para ajustar la enseñanza, no solo para poner una nota. Las opciones correctas casi siempre hablan de \"mejorar\", \"tomar decisiones\" o \"fortalecer procesos\", casi nunca de \"certificar\" o \"medir para comparar\".",
+       ejemplo:{
+         situacion:"Se afirma que la evaluación es de naturaleza social —no un acto aislado del profesor.",
+         pregunta:"Esto hace referencia a que la evaluación es:",
+         opciones:{A:"Un acto individual propio de la autonomía del profesor.",
+                    B:"Una plataforma de debate entre evaluados y evaluadores.",
+                    C:"Una práctica que conduce a la competitividad.",
+                    D:"Una práctica participativa de toda la institución educativa."},
+         correcta:"D",
+         porque:"Porque \"social\" implica que evaluar involucra a toda la comunidad educativa —no solo al profesor decidiendo en solitario ni a un debate limitado entre dos partes— y esa participación amplia es justamente lo que permite mejorar los procesos, no solo calificarlos."}},
+      {comp:"aut", d:"La autorregulación es que el estudiante aprenda a evaluarse y dirigirse a sí mismo. Las respuestas correctas suelen dar protagonismo al estudiante dentro del proceso evaluativo (opinar, participar, construir criterios), no solo recibir una calificación del profesor.",
+       ejemplo:{
+         situacion:"Una institución quiere formar en valores y actitudes autónomas hacia los deberes escolares e implementa un modelo para desarrollar la autonomía.",
+         pregunta:"Un profesor que quiera desarrollar la autonomía en sus estudiantes deberá:",
+         opciones:{A:"Diagnosticar ideas previas y planear la clase, identificando a los estudiantes con mejores resultados.",
+                    B:"Conformar y liderar una mesa redonda con todos los estudiantes, para construir en colectivo los criterios con que serán evaluados.",
+                    C:"Conocer la opinión de los estudiantes sobre la clase y asignar tareas extra a quienes no aprueben.",
+                    D:"Dialogar con los padres para verificar que sus hijos hacen las tareas."},
+         correcta:"B",
+         porque:"Porque le entrega a los estudiantes el poder de construir sus propios criterios de evaluación —eso es autorregulación real—, en vez de que el profesor o los padres sigan controlando el proceso desde afuera."}}
+    ]
+  },
+  ensenar: {
+    resumen: "El módulo Enseñar evalúa cómo diseñas, planeas y llevas a la práctica la enseñanza: desde una unidad didáctica completa hasta una actividad de una sola clase. El hilo conductor es siempre el mismo: ¿la actividad realmente hace pensar y participar al estudiante, o solo lo mantiene ocupado u obediente?",
+    claves: [
+      {comp:"dis", d:"Diseñar no es solo escribir un plan de clase. Es partir del contexto, las características de los estudiantes y los modelos pedagógicos para construir currículo con sentido. Las respuestas correctas casi siempre integran varios elementos a la vez (contexto + contenido + modelo pedagógico), en vez de enfocarse en uno solo aislado.",
+       ejemplo:{
+         situacion:"La nación wayuu transmite su saber de forma oral y práctica, mediada por la espiritualidad, el ejemplo y la convivencia. Se diseña un proyecto etnoeducativo para los primeros grados en una institución de La Guajira.",
+         pregunta:"Los objetivos de formación deben orientarse a:",
+         opciones:{A:"Fomentar procesos de comunicación para compartir conocimientos con otras culturas.",
+                    B:"Promover el intercambio de experiencias, asimilando costumbres de otras culturas.",
+                    C:"Fortalecer los procesos de escritura para adquirir una segunda lengua.",
+                    D:"Favorecer, desde la palabra hablada y la interacción, procesos que fortalezcan la identidad cultural."},
+         correcta:"D",
+         porque:"Porque el diseño curricular debe partir del contexto real de la comunidad (su oralidad, su forma propia de transmitir el saber) y no imponer formas ajenas como la escritura o la asimilación de otra cultura."}},
+      {comp:"act", d:"Se trata de reconocer qué actividades realmente generan aprendizaje profundo: las que conectan con la vida real, permiten resolver problemas y dan protagonismo al estudiante — frente a las que solo transmiten información o mantienen ocupados a los estudiantes sin exigirles pensar.",
+       ejemplo:{
+         situacion:"El mismo grupo de décimo grado inconforme con la clase aburrida (llamar a lista, explicar, taller del libro, tarea). El coordinador propone integrar a los estudiantes en situaciones auténticas que desarrollen habilidades cognitivas.",
+         pregunta:"¿Qué estrategia se ajusta a esa intención?",
+         opciones:{A:"Identificar problemáticas del contexto cercano que involucren múltiples explicaciones posibles.",
+                    B:"Una consulta con guía preestablecida por el profesor, a partir de un texto asignado.",
+                    C:"Actividades espontáneas, independientes de la planificación, para centrar la atención.",
+                    D:"Exposiciones y consultas que motiven a los estudiantes a participar más."},
+         correcta:"A",
+         porque:"Porque conecta la clase con un problema real y abierto (no con una guía cerrada ni con actividades sin planificar), lo que obliga a los estudiantes a pensar y a considerar varias explicaciones posibles."}},
+      {comp:"did", d:"La didáctica de las disciplinas es saber cómo se enseña un saber específico, no solo saber el contenido. Las respuestas correctas casi siempre muestran una relación reflexiva y crítica del estudiante con el conocimiento, no una transmisión directa de información.",
+       ejemplo:{
+         situacion:"El plan de estudios de una institución promueve la interdisciplinariedad: relacionar contenidos de diferentes áreas y hacer explícitas las condiciones socio-históricas de las disciplinas.",
+         pregunta:"Para favorecer la interdisciplinariedad, el profesor procura que sus estudiantes sean capaces de:",
+         opciones:{A:"Aprender los saberes propios de cada área escolar.",
+                    B:"Articular problemas de distintos campos del saber.",
+                    C:"Identificar los objetos de conocimiento de la ciencia.",
+                    D:"Integrar temas trabajados en distintos grados escolares."},
+         correcta:"B",
+         porque:"Porque la interdisciplinariedad no es aprender cada área por separado (eso sería lo contrario), sino usar el conocimiento de una disciplina para resolver problemas que cruzan varios campos del saber a la vez."}}
+    ]
+  }
+};
+
+</script>
+
+<script>
+(function(){
+  const root = document.getElementById('root');
+
+  const state = {
+    screen:'setup',
+    modo:'estudio',        // 'estudio' | 'simulacro' | 'concepto'
+    modulos:['formar','evaluar','ensenar'],
+    cantidad:'todas',      // 'todas' | '10' | '20'
+    preguntas:[],          // array armado para la sesión
+    idx:0,
+    respuestas:[],         // {pregunta, elegida, correcta}
+    seleccionActual:null,
+    revelado:false,
+    tiempoRestante:0,
+    timerId:null,
+    guiaStep:0,             // paso activo del slider "cómo leer una pregunta"
+    conceptoTab:'guia',     // 'guia' | 'formar' | 'evaluar' | 'ensenar'
+    reporteNombre:'',
+    reporteDocumento:'',
+    ejemplosAbiertos:{}     // {'formar-fis': true, ...} control de acordeones
+  };
+
+  function shuffle(arr){
+    const a=arr.slice();
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+    return a;
+  }
+
+  function armarPreguntas(){
+    let pool=[];
+    state.modulos.forEach(m=>{
+      MODULOS[m].preguntas.forEach(p=>pool.push(Object.assign({modulo:m}, p)));
+    });
+    pool = shuffle(pool);
+    if(state.cantidad!=='todas'){
+      pool = pool.slice(0, parseInt(state.cantidad,10));
+    }
+    return pool;
+  }
+
+  function segundosPorPregunta(){ return 75; } // ~75s por ítem en simulacro
+
+  function startSesion(){
+    if(state.modo==='concepto'){
+      state.screen='concepto';
+      render();
+      return;
+    }
+    state.preguntas = armarPreguntas();
+    state.idx=0;
+    state.respuestas=[];
+    state.seleccionActual=null;
+    state.revelado=false;
+    state.screen='quiz';
+    if(state.modo==='simulacro'){
+      state.tiempoRestante = state.preguntas.length * segundosPorPregunta();
+      startTimer();
+    }
+    render();
+  }
+
+  function startTimer(){
+    clearInterval(state.timerId);
+    state.timerId = setInterval(()=>{
+      state.tiempoRestante--;
+      if(state.tiempoRestante<=0){
+        clearInterval(state.timerId);
+        finalizarSesion();
+        return;
+      }
+      const el = document.getElementById('timerDisplay');
+      if(el){
+        el.textContent = fmtTime(state.tiempoRestante);
+        el.className = 'timer' + (state.tiempoRestante<60?' low':'');
+      }
+    },1000);
+  }
+
+  function fmtTime(s){
+    const m=Math.floor(s/60), sec=s%60;
+    return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+  }
+
+  function elegirOpcion(letra){
+    if(state.modo==='estudio' && state.revelado) return;
+    state.seleccionActual = letra;
+    if(state.modo==='estudio'){
+      state.revelado = true;
+    }
+    render();
+  }
+
+  function siguiente(){
+    const p = state.preguntas[state.idx];
+    state.respuestas.push({
+      modulo:p.modulo, n:p.n, comp:p.comp,
+      elegida:state.seleccionActual, correcta:p.correcta,
+      acierto: state.seleccionActual===p.correcta
+    });
+    state.idx++;
+    state.seleccionActual=null;
+    state.revelado=false;
+    if(state.idx>=state.preguntas.length){
+      finalizarSesion();
+    } else {
+      render();
+    }
+  }
+
+  function finalizarSesion(){
+    clearInterval(state.timerId);
+    // si quedó una pregunta sin responder (por timeout) la registramos como fallada
+    if(state.respuestas.length < state.preguntas.length){
+      for(let i=state.respuestas.length;i<state.preguntas.length;i++){
+        const p = state.preguntas[i];
+        state.respuestas.push({modulo:p.modulo, n:p.n, comp:p.comp, elegida:null, correcta:p.correcta, acierto:false});
+      }
+    }
+    state.screen='resultados';
+    render();
+  }
+
+  function volverInicio(){
+    clearInterval(state.timerId);
+    state.screen='setup';
+    render();
+  }
+
+  // ---------- RENDER ----------
+
+  function render(){
+    root.innerHTML='';
+    root.appendChild(masthead());
+    if(state.screen==='setup') root.appendChild(viewSetup());
+    if(state.screen==='quiz') root.appendChild(viewQuiz());
+    if(state.screen==='resultados') root.appendChild(viewResultados());
+    if(state.screen==='concepto') root.appendChild(viewConceptos());
+  }
+
+  function el(tag, cls, html){
+    const e=document.createElement(tag);
+    if(cls) e.className=cls;
+    if(html!==undefined) e.innerHTML=html;
+    return e;
+  }
+
+  function masthead(){
+    const wrap = el('div','masthead');
+    const left = el('div');
+    left.appendChild(el('div','eyebrow','Práctica pedagógica para Normalistas Superiores'));
+    left.appendChild(el('h1',null,'Simulador Saber Pro / TyT'));
+    left.appendChild(el('div','sub','Módulos de la práctica pedagógica · Formar — Evaluar — Enseñar'));
+    wrap.appendChild(left);
+    wrap.appendChild(el('div','badge-seal','73 ítems oficiales Icfes'));
+    return wrap;
+  }
+
+  function viewSetup(){
+    const wrap = el('div');
+
+    // modo
+    const card1 = el('div','card');
+    card1.appendChild(el('span','field-label','1 · Modo de entrenamiento'));
+    const grid1 = el('div','choice-grid');
+    const optEstudio = el('div','choice'+(state.modo==='estudio'?' selected':''),
+      '<h4>Modo estudio</h4><p>Responde y recibe retroalimentación inmediata: por qué la opción es correcta y por qué las demás no lo son.</p>');
+    optEstudio.onclick=()=>{state.modo='estudio'; render();};
+    const optSimulacro = el('div','choice'+(state.modo==='simulacro'?' selected':''),
+      '<h4>Modo simulacro</h4><p>Presión de examen real: tiempo cronometrado, sin pistas. La retroalimentación llega al final, por competencia.</p>');
+    optSimulacro.onclick=()=>{state.modo='simulacro'; render();};
+    const optConcepto = el('div','choice'+(state.modo==='concepto'?' selected':''),
+      '<h4>Modo conceptualización</h4><p>Antes de practicar: qué evalúa cada módulo y cada competencia, explicado en simple, con las trampas más comunes.</p>');
+    optConcepto.onclick=()=>{state.modo='concepto'; render();};
+    grid1.appendChild(optConcepto); grid1.appendChild(optEstudio); grid1.appendChild(optSimulacro);
+    card1.appendChild(grid1);
+    wrap.appendChild(card1);
+
+    // modulos (no aplica en modo conceptualización: allí se navega por pestañas)
+    if(state.modo!=='concepto'){
+      const card2 = el('div','card');
+      card2.appendChild(el('span','field-label','2 · Módulos a entrenar'));
+      const grid2 = el('div','choice-grid');
+      ['formar','evaluar','ensenar'].forEach(m=>{
+        const active = state.modulos.includes(m);
+        const c = el('div','choice'+(active?' selected':''),
+          '<h4>'+MODULOS[m].titulo+'</h4><p>'+MODULOS[m].subtitulo+' · '+MODULOS[m].preguntas.length+' preguntas</p>');
+        c.onclick=()=>{
+          if(active){
+            if(state.modulos.length>1) state.modulos = state.modulos.filter(x=>x!==m);
+          } else {
+            state.modulos = state.modulos.concat([m]);
+          }
+          render();
+        };
+        grid2.appendChild(c);
+      });
+      card2.appendChild(grid2);
+      wrap.appendChild(card2);
+    }
+
+    // cantidad (no aplica en modo conceptualización)
+    if(state.modo!=='concepto'){
+      const card3 = el('div','card');
+      card3.appendChild(el('span','field-label','3 · Cantidad de preguntas'));
+      const totalDisp = state.modulos.reduce((s,m)=>s+MODULOS[m].preguntas.length,0);
+      const grid3 = el('div','choice-grid');
+      [['todas','Todas las disponibles','('+totalDisp+' preguntas)'],
+       ['10','Ronda corta','10 preguntas aleatorias'],
+       ['20','Ronda media','20 preguntas aleatorias']].forEach(([val,title,desc])=>{
+        const c = el('div','choice'+(state.cantidad===val?' selected':''),'<h4>'+title+'</h4><p>'+desc+'</p>');
+        c.onclick=()=>{state.cantidad=val; render();};
+        grid3.appendChild(c);
+      });
+      card3.appendChild(grid3);
+      wrap.appendChild(card3);
+    }
+
+    const btnRow = el('div','btn-row');
+    const startBtn = el('button','btn magenta', state.modo==='concepto' ? 'Ver conceptos →' : 'Comenzar →');
+    startBtn.onclick=startSesion;
+    btnRow.appendChild(startBtn);
+    wrap.appendChild(btnRow);
+
+    return wrap;
+  }
+
+  function viewQuiz(){
+    const wrap = el('div');
+    const p = state.preguntas[state.idx];
+    const pct = Math.round((state.idx/state.preguntas.length)*100);
+
+    const bar = el('div','quizbar');
+    bar.appendChild(el('span',null,'PREGUNTA '+(state.idx+1)+' / '+state.preguntas.length+' · '+MODULOS[p.modulo].titulo.toUpperCase()));
+    wrap.appendChild(bar);
+
+    if(state.modo==='simulacro'){
+      const t = el('span','timer'+(state.tiempoRestante<60?' low':''), fmtTime(state.tiempoRestante));
+      t.id='timerDisplay';
+      bar.appendChild(t);
+    }
+
+    const track = el('div','progress-track');
+    const fill = el('div','progress-fill'); fill.style.width=pct+'%';
+    track.appendChild(fill);
+    wrap.appendChild(track);
+
+    const meta = el('div','qmeta');
+    meta.appendChild(el('span','tag comp', COMPETENCIAS[p.modulo][p.comp]));
+    if(p.dif) meta.appendChild(el('span','tag dif-'+p.dif, 'Dificultad '+p.dif));
+    wrap.appendChild(meta);
+
+    wrap.appendChild(el('div','enunciado', p.enun));
+
+    const opsWrap = el('div','opciones');
+    ['A','B','C','D'].forEach(letra=>{
+      const isSel = state.seleccionActual===letra;
+      let cls='op';
+      if(state.modo==='estudio' && state.revelado){
+        cls+=' disabled';
+        if(letra===p.correcta) cls+=' correct';
+        else if(isSel) cls+=' wrong';
+      } else if(isSel){
+        cls+=' selected';
+      }
+      const op = el('div',cls,
+        '<span class="letra">'+letra+'</span><p>'+p.ops[letra]+'</p>');
+      if(!(state.modo==='estudio' && state.revelado)){
+        op.onclick=()=>elegirOpcion(letra);
+      }
+      opsWrap.appendChild(op);
+    });
+    wrap.appendChild(opsWrap);
+
+    if(state.modo==='estudio' && state.revelado){
+      const ok = state.seleccionActual===p.correcta;
+      const fb = el('div','feedback');
+      const head = el('div','feedback-head '+(ok?'ok':'no'), ok?'✓ Respuesta correcta':'✕ Respuesta incorrecta — la correcta es '+p.correcta);
+      fb.appendChild(head);
+      const body = el('div','feedback-body');
+      if(p.expl){
+        body.appendChild(el('div','why','<b>Por qué '+p.correcta+' es correcta:</b> '+p.expl.correcta));
+        Object.keys(p.expl.invalidas).forEach(letra=>{
+          body.appendChild(el('div','invalid-item','<b>Opción '+letra+':</b> '+p.expl.invalidas[letra]));
+        });
+      } else {
+        body.appendChild(el('div','no-explic','Esta pregunta no cuenta con justificación detallada por opción en el material fuente. Competencia evaluada: '+COMPETENCIAS[p.modulo][p.comp]+'.'));
+      }
+      fb.appendChild(body);
+      wrap.appendChild(fb);
+    }
+
+    const btnRow = el('div','btn-row');
+    const nextBtn = el('button','btn magenta', state.idx===state.preguntas.length-1?'Ver resultados →':'Siguiente →');
+    const canAdvance = state.modo==='simulacro' ? state.seleccionActual!==null : state.revelado;
+    nextBtn.disabled = !canAdvance;
+    nextBtn.onclick=siguiente;
+    btnRow.appendChild(nextBtn);
+    const exitBtn = el('button','btn secondary','Salir');
+    exitBtn.onclick=volverInicio;
+    btnRow.appendChild(exitBtn);
+    wrap.appendChild(btnRow);
+
+    return wrap;
+  }
+
+  function sugerenciaPara(p){
+    if(p>=0.85) return "Dominio sólido. Mantén el ritmo con simulacros completos espaciados en el tiempo.";
+    if(p>=0.6) return "Nivel aceptable, con espacio de mejora. Repasa el ejemplo típico de esta competencia en modo conceptualización y repite un bloque corto de preguntas.";
+    return "Nivel bajo. Vuelve al modo conceptualización para esta competencia, estudia con calma el ejemplo típico y las opciones descartadas, y practica un bloque dirigido antes del próximo simulacro.";
+  }
+
+  function generarReportePDF(){
+    if(!window.jspdf){
+      alert('No se pudo cargar la librería para generar el PDF. Verifica tu conexión a internet e inténtalo de nuevo.');
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({unit:'pt', format:'a4'});
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginX = 48;
+    let y = 56;
+
+    const total = state.respuestas.length;
+    const aciertos = state.respuestas.filter(r=>r.acierto).length;
+    const pct = total ? Math.round((aciertos/total)*100) : 0;
+
+    function checkPage(needed){
+      if(y+needed > pageHeight-50){ doc.addPage(); y=56; }
+    }
+
+    // Encabezado
+    doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(59,42,30);
+    doc.text('Reporte de desempeño', marginX, y);
+    y += 18;
+    doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.setTextColor(109,90,69);
+    doc.text('Simulador Saber Pro / TyT — módulos Formar, Evaluar y Enseñar', marginX, y);
+    y += 22;
+    doc.setDrawColor(220,196,160);
+    doc.line(marginX, y, pageWidth-marginX, y);
+    y += 22;
+
+    // Datos del estudiante
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(59,42,30);
+    doc.text('Datos del estudiante', marginX, y); y+=16;
+    doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
+    doc.text('Nombre: ' + (state.reporteNombre.trim() || 'No registrado'), marginX, y); y+=14;
+    doc.text('Documento de identidad: ' + (state.reporteDocumento.trim() || 'No registrado'), marginX, y); y+=14;
+    const fecha = new Date().toLocaleDateString('es-CO', {year:'numeric', month:'long', day:'numeric'});
+    doc.text('Fecha del reporte: ' + fecha, marginX, y); y+=14;
+    doc.text('Modo de la sesión: ' + (state.modo==='simulacro' ? 'Simulacro (cronometrado, sin retroalimentación en línea)' : 'Estudio (con retroalimentación inmediata)'), marginX, y); y+=22;
+
+    // Resultado general
+    doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.text('Resultado general', marginX, y); y+=16;
+    doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
+    doc.text('Preguntas respondidas: ' + total, marginX, y); y+=14;
+    doc.text('Aciertos: ' + aciertos + ' de ' + total + ' (' + pct + '%)', marginX, y); y+=22;
+
+    // Desempeño por competencia
+    const grouped = {};
+    state.respuestas.forEach(r=>{
+      const key = r.modulo+'|'+r.comp;
+      if(!grouped[key]) grouped[key]={ok:0,total:0, modulo:r.modulo, comp:r.comp};
+      grouped[key].total++;
+      if(r.acierto) grouped[key].ok++;
+    });
+    const filas = Object.values(grouped).sort((a,b)=>(a.ok/a.total)-(b.ok/b.total));
+
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(59,42,30);
+    doc.text('Desempeño por competencia', marginX, y); y+=8;
+
+    if(typeof doc.autoTable === 'function'){
+      const body = filas.map(f=>{
+        const p = Math.round((f.ok/f.total)*100);
+        return [MODULOS[f.modulo].titulo, COMPETENCIAS[f.modulo][f.comp], f.ok+'/'+f.total, p+'%'];
+      });
+      doc.autoTable({
+        startY: y+8,
+        margin:{left:marginX, right:marginX},
+        head:[['Módulo','Competencia','Aciertos','%']],
+        body: body,
+        styles:{font:'helvetica', fontSize:9, cellPadding:6, textColor:[59,42,30]},
+        headStyles:{fillColor:[181,73,42], textColor:255},
+        alternateRowStyles:{fillColor:[251,241,225]},
+        columnStyles:{0:{cellWidth:70}, 1:{cellWidth:300}, 2:{cellWidth:55}, 3:{cellWidth:40}}
+      });
+      y = doc.lastAutoTable.finalY + 20;
+    } else {
+      doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+      filas.forEach(f=>{
+        checkPage(24);
+        const p = Math.round((f.ok/f.total)*100);
+        const linea = MODULOS[f.modulo].titulo+' — '+COMPETENCIAS[f.modulo][f.comp]+': '+f.ok+'/'+f.total+' ('+p+'%)';
+        const split = doc.splitTextToSize(linea, pageWidth-2*marginX);
+        doc.text(split, marginX, y);
+        y += split.length*12 + 6;
+      });
+      y += 10;
+    }
+
+    // Preguntas para repasar
+    const falladas = state.respuestas.filter(r=>!r.acierto);
+    checkPage(60);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(59,42,30);
+    doc.text('Preguntas para repasar ('+falladas.length+')', marginX, y); y+=16;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(109,90,69);
+    if(falladas.length===0){
+      doc.text('Ninguna — el estudiante respondió correctamente todas las preguntas de la sesión.', marginX, y); y+=16;
+    } else {
+      const lista = falladas.map(f=>MODULOS[f.modulo].titulo+' #'+f.n).join('   ·   ');
+      const split = doc.splitTextToSize(lista, pageWidth-2*marginX);
+      doc.text(split, marginX, y); y += split.length*12+14;
+    }
+
+    // Sugerencias de refuerzo
+    checkPage(80);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(59,42,30);
+    doc.text('Sugerencias de refuerzo', marginX, y); y+=16;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(109,90,69);
+    filas.forEach(f=>{
+      checkPage(40);
+      const p = f.ok/f.total;
+      const texto = MODULOS[f.modulo].titulo+' · '+COMPETENCIAS[f.modulo][f.comp]+' — '+sugerenciaPara(p);
+      const split = doc.splitTextToSize(texto, pageWidth-2*marginX);
+      doc.text(split, marginX, y);
+      y += split.length*12 + 8;
+    });
+
+    // Pie de página
+    checkPage(34);
+    doc.setFont('helvetica','italic'); doc.setFontSize(8.5); doc.setTextColor(140,125,105);
+    doc.text('Generado automáticamente por el Simulador Saber Pro/TyT, con base en cuadernillos oficiales Icfes, con fines exclusivamente académicos.', marginX, y, {maxWidth: pageWidth-2*marginX});
+
+    const base = state.reporteNombre.trim() || state.reporteDocumento.trim() || 'estudiante';
+    const nombreArchivo = 'reporte_' + base.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+    doc.save(nombreArchivo + '.pdf');
+  }
+
+  function viewResultados(){
+    const wrap = el('div');
+    const total = state.respuestas.length;
+    const aciertos = state.respuestas.filter(r=>r.acierto).length;
+    const pct = total? Math.round((aciertos/total)*100) : 0;
+
+    const hero = el('div','score-hero');
+    hero.appendChild(el('div','score-num', aciertos+' / '+total));
+    hero.appendChild(el('div','score-label', pct+'% de acierto · modo '+(state.modo==='simulacro'?'simulacro':'estudio')));
+    wrap.appendChild(hero);
+
+    // breakdown por competencia (agrupado por modulo+comp)
+    const card = el('div','card');
+    card.appendChild(el('span','field-label','Desempeño por competencia'));
+    const grouped = {};
+    state.respuestas.forEach(r=>{
+      const key = r.modulo+'|'+r.comp;
+      if(!grouped[key]) grouped[key]={ok:0,total:0, modulo:r.modulo, comp:r.comp};
+      grouped[key].total++;
+      if(r.acierto) grouped[key].ok++;
+    });
+    Object.values(grouped).sort((a,b)=> (a.ok/a.total) - (b.ok/b.total)).forEach(g=>{
+      const p = g.ok/g.total;
+      const color = p>=0.75? 'var(--forest)' : p>=0.5? 'var(--gold)' : 'var(--brick)';
+      const row = el('div','comp-row');
+      row.appendChild(el('div','name','<b style="font-family:JetBrains Mono, monospace; font-size:10px; color:var(--magenta-deep);">'+MODULOS[g.modulo].titulo.toUpperCase()+'</b><br>'+COMPETENCIAS[g.modulo][g.comp]));
+      const track = el('div','comp-bar-track');
+      const fill = el('div','comp-bar-fill'); fill.style.width=(p*100)+'%'; fill.style.background=color;
+      track.appendChild(fill);
+      row.appendChild(track);
+      row.appendChild(el('div','frac', g.ok+'/'+g.total));
+      card.appendChild(row);
+    });
+    wrap.appendChild(card);
+
+    // preguntas falladas
+    const falladas = state.respuestas.filter(r=>!r.acierto);
+    if(falladas.length){
+      const card2 = el('div','card');
+      card2.appendChild(el('span','field-label','Preguntas para repasar ('+falladas.length+')'));
+      const list = el('div','failed-list');
+      falladas.forEach(f=>{
+        list.appendChild(el('span','failed-pill', MODULOS[f.modulo].titulo+' #'+f.n));
+      });
+      card2.appendChild(list);
+      card2.appendChild(el('div','hint','Vuelve a este cuadernillo en modo estudio, filtrando por estos módulos, para repasar exactamente estos ítems.'));
+      wrap.appendChild(card2);
+    }
+
+    // reporte PDF con datos del estudiante
+    const card3 = el('div','card');
+    card3.appendChild(el('span','field-label','Generar reporte en PDF'));
+    const introRep = document.createElement('p');
+    introRep.style.margin='0 0 14px'; introRep.style.fontSize='13.5px'; introRep.style.color='var(--ink-soft)'; introRep.style.lineHeight='1.5';
+    introRep.textContent = 'Ingresa el nombre y/o el documento del estudiante para identificar el reporte antes de descargarlo.';
+    card3.appendChild(introRep);
+
+    const formRow = document.createElement('div');
+    formRow.style.display='grid'; formRow.style.gridTemplateColumns='repeat(auto-fit,minmax(220px,1fr))'; formRow.style.gap='12px'; formRow.style.marginBottom='6px';
+
+    function campoTexto(labelTexto, valor, placeholder, onInput){
+      const w = document.createElement('div');
+      const lab = document.createElement('label');
+      lab.textContent = labelTexto;
+      lab.style.display='block'; lab.style.fontFamily="'JetBrains Mono',monospace"; lab.style.fontSize='11px';
+      lab.style.letterSpacing='.08em'; lab.style.textTransform='uppercase'; lab.style.color='var(--ink-soft)'; lab.style.marginBottom='6px';
+      w.appendChild(lab);
+      const inp = document.createElement('input');
+      inp.type='text'; inp.value=valor; inp.placeholder=placeholder;
+      inp.style.width='100%'; inp.style.boxSizing='border-box'; inp.style.padding='10px 12px';
+      inp.style.border='1.5px solid var(--line)'; inp.style.borderRadius='2px';
+      inp.style.fontFamily="'Source Serif 4',serif"; inp.style.fontSize='14px';
+      inp.style.background='var(--white)'; inp.style.color='var(--ink)';
+      inp.oninput = (e)=>{ onInput(e.target.value); };
+      w.appendChild(inp);
+      return w;
+    }
+
+    formRow.appendChild(campoTexto('Nombre completo del estudiante', state.reporteNombre, 'Ej. Ana María Pérez Salcedo', v=>{state.reporteNombre=v;}));
+    formRow.appendChild(campoTexto('Documento de identidad', state.reporteDocumento, 'Ej. 1.234.567.890', v=>{state.reporteDocumento=v;}));
+    card3.appendChild(formRow);
+
+    const repError = document.createElement('div');
+    repError.id='reporteError';
+    repError.style.display='none'; repError.style.color='var(--brick)'; repError.style.fontSize='13px'; repError.style.margin='4px 0 12px';
+    repError.textContent = 'Ingresa al menos el nombre o el documento del estudiante para generar el reporte.';
+    card3.appendChild(repError);
+
+    const genBtn = el('button','btn magenta','Descargar reporte en PDF ↓');
+    genBtn.style.marginTop='6px';
+    genBtn.onclick=()=>{
+      if(!state.reporteNombre.trim() && !state.reporteDocumento.trim()){
+        document.getElementById('reporteError').style.display='block';
+        return;
+      }
+      document.getElementById('reporteError').style.display='none';
+      generarReportePDF();
+    };
+    card3.appendChild(genBtn);
+    wrap.appendChild(card3);
+
+    const btnRow = el('div','btn-row');
+    const again = el('button','btn magenta','Nueva sesión');
+    again.onclick=volverInicio;
+    btnRow.appendChild(again);
+    wrap.appendChild(btnRow);
+
+    return wrap;
+  }
+
+  function renderGuiaSlider(){
+    const wrap = el('div');
+    wrap.style.marginTop='4px';
+
+    // nav superior: contador + flechas
+    const nav = el('div');
+    nav.style.display='flex'; nav.style.justifyContent='space-between'; nav.style.alignItems='center'; nav.style.marginBottom='14px';
+    const counter = el('span','eyebrow', 'PASO '+(state.guiaStep+1)+' DE '+GUIA_GENERAL.length);
+    nav.appendChild(counter);
+    const arrows = el('div');
+    arrows.style.display='flex'; arrows.style.gap='8px';
+    const prevBtn = el('button','btn secondary','←');
+    prevBtn.style.padding='6px 14px';
+    prevBtn.disabled = state.guiaStep===0;
+    prevBtn.onclick=()=>{state.guiaStep=Math.max(0,state.guiaStep-1); render();};
+    const nextBtn = el('button','btn secondary','→');
+    nextBtn.style.padding='6px 14px';
+    nextBtn.disabled = state.guiaStep===GUIA_GENERAL.length-1;
+    nextBtn.onclick=()=>{state.guiaStep=Math.min(GUIA_GENERAL.length-1,state.guiaStep+1); render();};
+    arrows.appendChild(prevBtn); arrows.appendChild(nextBtn);
+    nav.appendChild(arrows);
+    wrap.appendChild(nav);
+
+    const g = GUIA_GENERAL[state.guiaStep];
+    wrap.appendChild(el('h3',null,g.t));
+    const desc = document.createElement('p');
+    desc.style.margin='6px 0 16px'; desc.style.fontSize='14.5px'; desc.style.lineHeight='1.55'; desc.style.color='var(--ink-soft)';
+    desc.textContent = g.d;
+    wrap.appendChild(desc);
+
+    const exBox = document.createElement('div');
+    exBox.style.background='var(--paper)';
+    exBox.style.border='1px solid var(--line)';
+    exBox.style.borderRadius='2px';
+    exBox.style.padding='16px';
+    exBox.appendChild(el('div','eyebrow','Así se ve en una pregunta real'));
+    const inner = document.createElement('div');
+    inner.style.marginTop='10px';
+    inner.appendChild(renderEjemploFocus(g.focus));
+    exBox.appendChild(inner);
+    wrap.appendChild(exBox);
+
+    // puntos de navegación
+    const dots = document.createElement('div');
+    dots.style.display='flex'; dots.style.gap='7px'; dots.style.justifyContent='center'; dots.style.marginTop='16px';
+    GUIA_GENERAL.forEach((_,i)=>{
+      const d = document.createElement('span');
+      d.style.width='8px'; d.style.height='8px'; d.style.borderRadius='50%'; d.style.cursor='pointer';
+      d.style.background = i===state.guiaStep ? 'var(--magenta-deep)' : 'var(--line)';
+      d.onclick=()=>{state.guiaStep=i; render();};
+      dots.appendChild(d);
+    });
+    wrap.appendChild(dots);
+
+    return wrap;
+  }
+
+  function renderEjemploFocus(focus){
+    const E = EJEMPLO_GUIA;
+    const box = document.createElement('div');
+    box.style.fontSize='14px'; box.style.lineHeight='1.6';
+
+    if(focus==='situacion'){
+      const p = document.createElement('p');
+      p.style.margin='0 0 10px';
+      p.innerHTML = '<mark style="background:#f6dfa8; padding:1px 3px;">'+E.situacion+'</mark>';
+      box.appendChild(p);
+      const cap = document.createElement('p');
+      cap.style.margin='0'; cap.style.fontSize='13px'; cap.style.color='var(--ink-soft)';
+      cap.innerHTML = '<b>Quién actúa:</b> '+E.actor+' &nbsp;·&nbsp; <b>Qué está en juego:</b> '+E.problema;
+      box.appendChild(cap);
+    }
+
+    if(focus==='pregunta'){
+      const p1 = document.createElement('p');
+      p1.style.margin='0 0 8px'; p1.style.color='var(--ink-soft)';
+      p1.textContent = E.situacion;
+      box.appendChild(p1);
+      const p2 = document.createElement('p');
+      p2.style.margin='0 0 10px';
+      p2.innerHTML = '<mark style="background:#f6dfa8; padding:1px 3px; font-weight:600;">'+E.pregunta+' …</mark>';
+      box.appendChild(p2);
+      const cap = document.createElement('p');
+      cap.style.margin='0'; cap.style.fontSize='13px'; cap.style.color='var(--ink-soft)';
+      cap.innerHTML = 'La pregunta es por el <b>propósito de la estrategia</b>, no por el tema (acueducto y alcantarillado) ni por cómo ejecutarla paso a paso.';
+      box.appendChild(cap);
+    }
+
+    if(focus==='descarte'){
+      ['A','B','C','D'].forEach(letra=>{
+        const o = E.opciones[letra];
+        const ok = o.veredicto==='correcta';
+        const row = document.createElement('div');
+        row.style.display='flex'; row.style.gap='10px'; row.style.marginBottom='10px'; row.style.alignItems='flex-start';
+        const mark = document.createElement('span');
+        mark.style.fontFamily="'JetBrains Mono',monospace"; mark.style.fontWeight='700'; mark.style.fontSize='13px';
+        mark.style.color = ok ? 'var(--forest)' : 'var(--brick)';
+        mark.textContent = ok ? '✓ '+letra : '✕ '+letra;
+        row.appendChild(mark);
+        const txtWrap = document.createElement('div');
+        const t = document.createElement('div');
+        t.style.fontSize='13.5px';
+        t.style.textDecoration = ok ? 'none' : 'line-through';
+        t.style.color = ok ? 'var(--ink)' : 'var(--ink-soft)';
+        t.textContent = o.texto;
+        txtWrap.appendChild(t);
+        const r = document.createElement('div');
+        r.style.fontSize='12.5px'; r.style.marginTop='2px'; r.style.color = ok?'var(--forest)':'var(--brick)';
+        r.textContent = o.razon;
+        txtWrap.appendChild(r);
+        row.appendChild(txtWrap);
+        box.appendChild(row);
+      });
+    }
+
+    if(focus==='verbos'){
+      const grid = document.createElement('div');
+      grid.style.display='grid'; grid.style.gridTemplateColumns='repeat(auto-fit,minmax(150px,1fr))'; grid.style.gap='10px'; grid.style.marginBottom='10px';
+      ['A','B','C','D'].forEach(letra=>{
+        const o = E.opciones[letra];
+        const ok = o.veredicto==='correcta';
+        const c = document.createElement('div');
+        c.style.border='1.5px solid '+(ok?'var(--forest)':'var(--line)');
+        c.style.borderRadius='2px'; c.style.padding='10px';
+        c.style.background = ok ? '#eef2df' : 'var(--white)';
+        c.innerHTML = '<div style="font-family:JetBrains Mono,monospace; font-size:11px; color:var(--ink-soft);">OPCIÓN '+letra+'</div>' +
+                       '<div style="font-family:Fraunces,serif; font-weight:600; font-size:15px; margin-top:3px; color:'+(ok?'var(--forest)':'var(--ink)')+';">'+o.verbo+'</div>';
+        grid.appendChild(c);
+      });
+      box.appendChild(grid);
+      const cap = document.createElement('p');
+      cap.style.margin='0'; cap.style.fontSize='13px'; cap.style.color='var(--ink-soft)';
+      cap.innerHTML = '<b style="color:var(--forest);">construyan</b> implica que el estudiante crea algo nuevo con base en un análisis — el mayor nivel de protagonismo entre los cuatro verbos.';
+      box.appendChild(cap);
+    }
+
+    return box;
+  }
+
+  function buildModuloCard(m){
+    const mod = MODULOS[m];
+    const con = CONCEPTOS[m];
+    const card = el('div','card');
+    card.appendChild(el('span','field-label', mod.titulo.toUpperCase()+' · qué evalúa este módulo'));
+    const resumen = document.createElement('p');
+    resumen.style.fontSize='16px'; resumen.style.lineHeight='1.65'; resumen.style.margin='0 0 18px';
+    resumen.textContent = con.resumen;
+    card.appendChild(resumen);
+
+    con.claves.forEach(k=>{
+      const box = el('div');
+      box.style.borderLeft='3px solid var(--gold)';
+      box.style.padding='4px 0 4px 16px';
+      box.style.marginBottom='20px';
+      const tag = el('div','tag comp', COMPETENCIAS[m][k.comp]);
+      tag.style.marginBottom='6px'; tag.style.display='inline-block';
+      box.appendChild(tag);
+      const p = document.createElement('p');
+      p.style.margin='0 0 12px'; p.style.fontSize='14.5px'; p.style.lineHeight='1.55';
+      p.textContent = k.d;
+      box.appendChild(p);
+
+      if(k.ejemplo){
+        const ex = k.ejemplo;
+        const key = m+'-'+k.comp;
+        const abierto = !!state.ejemplosAbiertos[key];
+
+        const toggle = document.createElement('button');
+        toggle.type='button';
+        toggle.style.background='none'; toggle.style.border='none'; toggle.style.cursor='pointer';
+        toggle.style.padding='0'; toggle.style.font="inherit";
+        toggle.style.color='var(--magenta-deep)'; toggle.style.fontSize='13px'; toggle.style.fontWeight='600';
+        toggle.style.display='flex'; toggle.style.alignItems='center'; toggle.style.gap='6px';
+        toggle.innerHTML = '<span style="font-family:JetBrains Mono,monospace; font-size:11px;">'+(abierto?'▾':'▸')+'</span> '+(abierto?'Ocultar ejemplo típico':'Ver ejemplo típico');
+        toggle.onclick=()=>{ state.ejemplosAbiertos[key] = !abierto; render(); };
+        box.appendChild(toggle);
+
+        if(abierto){
+          const exBox = document.createElement('div');
+          exBox.style.background='var(--paper)';
+          exBox.style.border='1px solid var(--line)';
+          exBox.style.borderRadius='2px';
+          exBox.style.padding='14px 16px';
+          exBox.style.marginTop='10px';
+
+          const exLabel = el('div','eyebrow','Ejemplo típico');
+          exLabel.style.marginBottom='8px';
+          exBox.appendChild(exLabel);
+
+          const sit = document.createElement('p');
+          sit.style.margin='0 0 8px'; sit.style.fontSize='14px'; sit.style.lineHeight='1.55';
+          sit.textContent = ex.situacion;
+          exBox.appendChild(sit);
+
+          const preg = document.createElement('p');
+          preg.style.margin='0 0 10px'; preg.style.fontSize='14px'; preg.style.fontWeight='600'; preg.style.fontStyle='italic';
+          preg.textContent = ex.pregunta;
+          exBox.appendChild(preg);
+
+          const opsMini = document.createElement('div');
+          opsMini.style.display='flex'; opsMini.style.flexDirection='column'; opsMini.style.gap='6px'; opsMini.style.marginBottom='10px';
+          ['A','B','C','D'].forEach(letra=>{
+            const isC = letra===ex.correcta;
+            const row = document.createElement('div');
+            row.style.display='flex'; row.style.gap='8px'; row.style.fontSize='13px'; row.style.lineHeight='1.45';
+            row.style.color = isC ? 'var(--forest)' : 'var(--ink-soft)';
+            row.style.fontWeight = isC ? '700' : '400';
+            row.innerHTML = '<span>'+(isC?'✓':'·')+' '+letra+'.</span><span>'+ex.opciones[letra]+'</span>';
+            opsMini.appendChild(row);
+          });
+          exBox.appendChild(opsMini);
+
+          const why = document.createElement('p');
+          why.style.margin='0'; why.style.fontSize='13.5px'; why.style.lineHeight='1.55'; why.style.color='var(--ink-soft)';
+          why.innerHTML = '<b style="color:var(--ink); font-family:Fraunces,serif;">¿Por qué '+ex.correcta+'?</b> '+ex.porque;
+          exBox.appendChild(why);
+
+          box.appendChild(exBox);
+        }
+      }
+
+      card.appendChild(box);
+    });
+    return card;
+  }
+
+  function viewConceptos(){
+    const wrap = el('div');
+
+    const tabbar = el('div','tabbar');
+    const tabs = [
+      ['guia','Cómo leer una pregunta situacional'],
+      ['formar','Formar · qué evalúa este módulo'],
+      ['evaluar','Evaluar · qué evalúa este módulo'],
+      ['ensenar','Enseñar · qué evalúa este módulo']
+    ];
+    tabs.forEach(([key,label])=>{
+      const btn = el('button','tab-btn'+(state.conceptoTab===key?' active':''), label);
+      btn.onclick=()=>{ state.conceptoTab=key; render(); };
+      tabbar.appendChild(btn);
+    });
+    wrap.appendChild(tabbar);
+
+    if(state.conceptoTab==='guia'){
+      const guia = el('div','card');
+      guia.appendChild(el('span','field-label','Cómo leer una pregunta situacional'));
+      guia.appendChild(renderGuiaSlider());
+      wrap.appendChild(guia);
+    } else {
+      wrap.appendChild(buildModuloCard(state.conceptoTab));
+    }
+
+    const btnRow = el('div','btn-row');
+    const practicar = el('button','btn magenta', state.conceptoTab==='guia' ? 'Practicar en modo estudio →' : 'Practicar este módulo en modo estudio →');
+    practicar.onclick=()=>{
+      state.modo='estudio';
+      if(state.conceptoTab!=='guia') state.modulos=[state.conceptoTab];
+      state.screen='setup';
+      render();
+    };
+    btnRow.appendChild(practicar);
+    const back = el('button','btn secondary','Volver');
+    back.onclick=volverInicio;
+    btnRow.appendChild(back);
+    wrap.appendChild(btnRow);
+
+    return wrap;
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
